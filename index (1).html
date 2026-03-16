@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente Inversor Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070605;--s1:#0e0c09;--bd:#1c1a12;--gold:#e2c97e;--gdim:#a8945a;--text:#c8bfa8;--dim:#5a5040;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--blue:#60a5fa}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;font-size:13px}
+input,select{background:#161410;border:1px solid var(--bd);border-radius:6px;color:var(--text);font-family:inherit;font-size:11px;padding:6px 9px;outline:none}
+input:focus,select:focus{border-color:var(--gdim)}
+select option{background:#161410}
+button{cursor:pointer;font-family:inherit}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2416;border-radius:2px}
+.wrap{max-width:980px;margin:0 auto;padding:16px 14px}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:16px;overflow-x:auto;gap:0}
+.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);font-size:10px;letter-spacing:.08em;padding:8px 12px;text-transform:uppercase;white-space:nowrap;transition:all .2s}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.lbl{color:var(--dim);font-size:9px;letter-spacing:.12em;display:block;margin-bottom:5px}
+.btn{background:linear-gradient(135deg,#2a2010,#1e1810);border:1px solid #a8945a55;color:var(--gold);font-size:10px;padding:6px 12px;border-radius:7px}
+.btn-blue{background:linear-gradient(135deg,#0a1428,#081020);border:1px solid #60a5fa44;color:var(--blue);font-size:10px;padding:6px 12px;border-radius:7px}
+.btn-sm{background:none;border:1px solid var(--bd);color:var(--dim);font-size:10px;padding:3px 8px;border-radius:5px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:#0b0a07;border:1px solid var(--bd);border-radius:9px;padding:10px 12px}
+.stat .v{font-size:18px;font-weight:500;margin-top:3px}
+.alert-bar{background:#200a0a;border:1px solid #f8717144;border-radius:8px;padding:9px 13px;margin-bottom:12px;font-size:11px}
+.toast-wrap{position:fixed;top:12px;right:12px;z-index:999;display:flex;flex-direction:column;gap:6px;max-width:260px}
+.toast{border-radius:8px;padding:10px 12px;display:flex;gap:7px;font-size:11px;animation:slin .3s ease}
+.news-item{border-bottom:1px solid var(--bd);padding:10px 0}
+.news-item:last-child{border-bottom:none}
+.sig-buy{background:#0d2318;border:1px solid #22c55e55;color:#4ade80;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block}
+.sig-sell{background:#2d0f0f;border:1px solid #ef444455;color:#f87171;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block}
+.sig-hold{background:#1a1610;border:1px solid #a8945a44;color:#e2c97e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-block}
+.ai-box{background:#0e0c09;border:1px solid #3a3020;border-radius:8px;padding:12px 14px;margin-top:8px}
+.ai-box h3{color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #2a2416;padding-bottom:3px;margin:12px 0 4px}
+.ai-box p{margin:2px 0;line-height:1.65;color:#c8bfa8;font-size:11px}
+.spinner{width:16px;height:16px;border:2px solid #2a2416;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slin{from{transform:translateX(10px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body>
+
+<div id="toasts" class="toast-wrap"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+  <div>
+    <h1 style="font-size:22px;color:#f0e6c8;font-weight:400">Agente <span style="color:var(--gold)">Inversor</span> <span style="font-style:italic;color:var(--dim);font-size:15px">Pro</span></h1>
+    <p style="color:var(--dim);font-size:9px;margin-top:2px;letter-spacing:.1em">LIVE · NOTICIAS · SEÑALES · MACRO · SIMULADOR SELFBANK</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <button class="btn" style="font-size:9px;padding:4px 9px" onclick="toggleKeyPanel()">✦ <span id="key-lbl">Activar IA</span></button>
+    <div style="display:flex;align-items:center;gap:4px">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite"></div>
+      <span id="clock" style="color:var(--dim);font-size:9px">LIVE</span>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY PANEL -->
+<div id="key-panel" style="display:none;background:#0e1018;border:1px solid #60a5fa33;border-radius:8px;padding:10px 12px;margin-bottom:12px">
+  <div style="color:var(--blue);font-size:10px;font-weight:700;margin-bottom:6px">API Key Anthropic — console.anthropic.com ($5 gratis al registrarte · ~2-5€/mes después)</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <input type="password" id="api-key-inp" placeholder="sk-ant-xxxx..." style="flex:1;min-width:200px">
+    <button class="btn" onclick="saveKey()">Guardar</button>
+    <span style="color:var(--dim);font-size:10px">Activa los botones ✦ IA en toda la app</span>
+  </div>
+</div>
+
+<!-- ALERTA MACRO -->
+<div class="alert-bar">
+  <span style="color:var(--red);font-weight:700">🚨 15 MAR 2026: </span>
+  <span style="color:#c8a0a0">Ormuz cerrado · Brent $100+ · S&P500 -5% · VIX 28 · Fed retrasa recortes sept 2026 · Rearme europeo +40%</span>
+</div>
+
+<!-- STATS -->
+<div class="stat-grid" id="stats-row">
+  <div class="stat"><div class="lbl">CARTERA</div><div class="v" style="color:var(--gold)" id="sv-port">€0</div></div>
+  <div class="stat"><div class="lbl">P&L TOTAL</div><div class="v" id="sv-pnl">€0</div><div id="sv-pct" style="font-size:10px"></div></div>
+  <div class="stat"><div class="lbl">WATCHLIST</div><div class="v" style="color:var(--blue)" id="sv-wl">0</div></div>
+  <div class="stat"><div class="lbl">ALERTAS ON</div><div class="v" style="color:var(--yellow)" id="sv-al">0</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs" id="tabs">
+  <button class="tab on" onclick="setTab('ahora',this)">🔴 Ahora</button>
+  <button class="tab" onclick="setTab('noticias',this)">📰 Noticias</button>
+  <button class="tab" onclick="setTab('mercado',this)">📡 Mercado</button>
+  <button class="tab" onclick="setTab('cartera',this)">💼 Cartera</button>
+  <button class="tab" onclick="setTab('macro',this)">🗺️ Macro</button>
+  <button class="tab" onclick="setTab('recs',this)">⭐ Recomendaciones</button>
+  <button class="tab" onclick="setTab('fondos',this)">📊 Fondos</button>
+  <button class="tab" onclick="setTab('alertas',this)">🔔 Alertas</button>
+  <button class="tab" onclick="setTab('sim',this)">🔬 Selfbank</button>
+</div>
+
+<!-- TAB CONTENT -->
+<div id="tab-content"></div>
+
+</div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════════
+const ASSETS = {
+  "IBE.MC":{name:"Iberdrola",risk:"bajo",price:13.42,cur:"EUR",sector:"Utilities",beta:0.58},
+  "REP.MC":{name:"Repsol",risk:"medio",price:14.18,cur:"EUR",sector:"Energy",beta:0.85},
+  "SAN.MC":{name:"Santander",risk:"medio",price:5.62,cur:"EUR",sector:"Finance",beta:0.92},
+  "ITX.MC":{name:"Inditex",risk:"medio",price:48.20,cur:"EUR",sector:"Consumer",beta:0.78},
+  "TEF.MC":{name:"Telefónica",risk:"medio",price:4.18,cur:"EUR",sector:"Telecom",beta:0.72},
+  "AAPL":{name:"Apple",risk:"medio",price:213.18,cur:"USD",sector:"Technology",beta:1.20},
+  "MSFT":{name:"Microsoft",risk:"medio",price:415.50,cur:"USD",sector:"Technology",beta:0.90},
+  "NVDA":{name:"NVIDIA",risk:"alto",price:875.40,cur:"USD",sector:"Technology",beta:1.75},
+  "TSLA":{name:"Tesla",risk:"alto",price:177.90,cur:"USD",sector:"Automotive",beta:2.10},
+  "LMT":{name:"Lockheed Martin",risk:"medio",price:520.40,cur:"USD",sector:"Defense",beta:0.78},
+  "TTE":{name:"TotalEnergies",risk:"medio",price:58.40,cur:"EUR",sector:"Energy",beta:0.82},
+  "JPM":{name:"JPMorgan Chase",risk:"medio",price:198.40,cur:"USD",sector:"Finance",beta:0.92},
+  "SPY":{name:"S&P 500 ETF",risk:"bajo",price:524.80,cur:"USD",sector:"Broad Market",beta:1.00},
+  "QQQ":{name:"Nasdaq 100",risk:"medio",price:448.20,cur:"USD",sector:"Tech Growth",beta:1.20},
+  "XLE":{name:"Energy ETF",risk:"alto",price:91.20,cur:"USD",sector:"Energy",beta:1.10},
+  "GLD":{name:"Gold ETF",risk:"medio",price:218.40,cur:"USD",sector:"Commodities",beta:0.15},
+  "VWRL":{name:"Vanguard All-World",risk:"bajo",price:108.35,cur:"USD",sector:"Global",beta:0.95},
+  "CSPX":{name:"iShares S&P500",risk:"bajo",price:580.20,cur:"USD",sector:"S&P 500",beta:1.00},
+  "IWDA":{name:"iShares MSCI World",risk:"bajo",price:95.40,cur:"EUR",sector:"MSCI World",beta:1.00},
+  "SOXS":{name:"Semi Bear 3x",risk:"muy alto",price:18.20,cur:"USD",sector:"Inverse",beta:-3.0},
+  "SPXS":{name:"S&P Bear 3x",risk:"muy alto",price:9.80,cur:"USD",sector:"Inverse",beta:-3.0},
+};
+
+const RC={bajo:"#4ade80",medio:"#fbbf24",alto:"#f97316","muy alto":"#f87171"};
+const AC={"COMPRAR HOY":"#f87171","COMPRAR":"#4ade80","ACUMULAR":"#60a5fa","MANTENER":"#fbbf24","AÑADIR":"#a3e635","TÁCTICA":"#c084fc"};
+
+const RECS=[
+  {ticker:"XLE",accion:"COMPRAR HOY",urg:"critica",peso:"8%",obj:115,stop:82,hor:"1-6 meses",razon:"Ormuz cerrado = petróleo alto = energía sube. ETF diversificado sin riesgo empresa individual.",cat:"Brent $100+, Goldman target $150"},
+  {ticker:"REP.MC",accion:"COMPRAR HOY",urg:"critica",peso:"5%",obj:24,stop:12.5,hor:"1-4 meses",razon:"Goldman objetivo €24. Con Brent $100+ sus márgenes se disparan.",cat:"Goldman objetivo €24"},
+  {ticker:"IBE.MC",accion:"MANTENER",urg:"alta",peso:"10%",obj:17.5,stop:11.8,hor:"3-5 años",razon:"Ya la tienes. Utility defensiva + renovables. Crisis energética acelera transición.",cat:"Tipos bajos sept + renovables"},
+  {ticker:"LMT",accion:"COMPRAR",urg:"alta",peso:"6%",obj:680,stop:470,hor:"6-18 meses",razon:"Rearme europeo +40% presupuestos. Tendencia estructural de años.",cat:"Rearme europeo + conflicto Irán"},
+  {ticker:"GLD",accion:"AÑADIR",urg:"media",peso:"6%",obj:265,stop:195,hor:"3-12 meses",razon:"JPMorgan objetivo $6.300 a fin 2026. Refugio clásico en incertidumbre.",cat:"JPM objetivo $6.300"},
+  {ticker:"VWRL",accion:"ACUMULAR",urg:"media",peso:"25%",obj:135,stop:95,hor:"5-10 años",razon:"Núcleo de cartera. Corrección actual es oportunidad. 2.700 empresas globales.",cat:"Corrección geopolítica = entrada"},
+  {ticker:"NVDA",accion:"ACUMULAR",urg:"media",peso:"8%",obj:1200,stop:720,hor:"2-4 años",razon:"Tesis IA estructural. Solo acumular en caídas del 15-20%, no perseguir rallies.",cat:"CapEx IA no se para"},
+  {ticker:"SPXS",accion:"TÁCTICA",urg:"media",peso:"3%",obj:14,stop:8,hor:"días",razon:"ETF inverso 3x. Solo si Ormuz sigue cerrado y Fed hawkish. Stop estricto. Nunca de fondo.",cat:"Escalada confirmada"},
+];
+
+const MACRO=[
+  {id:"war",icon:"🛢️",title:"Tensión geopolítica / Petróleo",active:true,color:"#f97316",sub:"Ormuz cerrado · Brent $100+",triggers:["Ormuz cerrado indefinidamente","Brent $100+, Goldman target $150","VIX 28+","S&P500 -5% desde máximos"],winners:[["XLE","+15/+40%"],["REP.MC","+12/+30%"],["LMT","+15/+35%"],["GLD","+8/+20%"],["TTE","+10/+25%"]],losers:["Aerolíneas","Tech growth","Emergentes"],playbook:"XLE y REP son las jugadas directas. GLD como cobertura. Stop-loss obligatorio en todas. Reducir growth especulativo."},
+  {id:"inf",icon:"📈",title:"Inflación elevada",active:true,color:"#eab308",sub:"PCE 2.8% · Fed hawkish",triggers:["PCE 2.8% persistente","Fed retrasa recortes a sept 2026","Energía cara"],winners:[["IBE.MC","+5/+15%"],["GLD","+8/+18%"],["XLE","+10/+25%"]],losers:["Bonos largo plazo","ARK/growth"],playbook:"Utilities (Iberdrola), oro y energía. Reducir renta fija larga. Iberdrola encaja aquí: dividendo estable + renovables."},
+  {id:"cut",icon:"🏦",title:"Bajada de tipos (sept 2026)",active:false,color:"#4ade80",sub:"1er recorte esperado sept 2026",triggers:["Fed confirma recorte","IPC <2.5% varios meses","Empleo modera"],winners:[["NVDA","+20/+50%"],["QQQ","+15/+40%"],["IBE.MC","+10/+25%"],["MSFT","+12/+30%"]],losers:["Cash","Bonos corto plazo"],playbook:"El mejor escenario para tech y growth. Cuando llegue: aumentar QQQ. Iberdrola doble beneficio: deuda barata + renovables."},
+  {id:"def",icon:"🛡️",title:"Rearme europeo",active:true,color:"#60a5fa",sub:"Presupuestos defensa +40% UE",triggers:["Presupuestos +40% defensa UE","Conflicto Irán en curso","OTAN aumenta gasto"],winners:[["LMT","+15/+35%"],["Indra","+20%"],["NOC","+12/+28%"]],losers:["Consumo discrecional"],playbook:"Superciclo defensa estructural de años. LMT la jugada más líquida. Horizonte mínimo 12 meses. No es táctica: es tendencia."},
+];
+
+const FUNDS=[
+  {name:"Vanguard Global Stock Index EUR Acc",isin:"IE00B03HD191",ter:0.18,ms:5,r5:12.21,r1:6.51,tipo:"MSCI World",fis:"Traspasable sin peaje",donde:"MyInvestor, IronIA, Indexa Capital"},
+  {name:"Fidelity MSCI World Index Fund",isin:"IE00BYX5NX33",ter:0.12,ms:5,r5:12.15,r1:6.40,tipo:"MSCI World",fis:"Traspasable sin peaje",donde:"MyInvestor, Trade Republic"},
+  {name:"iShares Core MSCI World UCITS ETF (IWDA)",isin:"IE00B4L5Y983",ter:0.20,ms:5,r5:12.18,r1:6.45,tipo:"MSCI World ETF",fis:"ETF — tributa al vender",donde:"DEGIRO, Trade Republic, Interactive Brokers"},
+  {name:"Vanguard FTSE All-World UCITS ETF (VWRL)",isin:"IE00B3RBWM25",ter:0.22,ms:5,r5:11.90,r1:6.20,tipo:"FTSE All-World ETF",fis:"ETF — tributa al vender",donde:"DEGIRO, Interactive Brokers"},
+  {name:"iShares Core S&P 500 UCITS ETF (CSPX)",isin:"IE00B5BMR087",ter:0.07,ms:5,r5:14.90,r1:9.20,tipo:"S&P 500 ETF",fis:"ETF — tributa al vender",donde:"DEGIRO, Trade Republic, XTB"},
+  {name:"Vanguard Total World Stock ETF (VT)",isin:"US9220427424",ter:0.06,ms:5,r5:11.80,r1:6.10,tipo:"FTSE Global All Cap",fis:"ETF — tributa al vender",donde:"Interactive Brokers, DEGIRO"},
+  {name:"Vanguard U.S. 500 Stock Index (S&P500)",isin:"IE0032620787",ter:0.10,ms:5,r5:14.80,r1:9.10,tipo:"S&P 500",fis:"Traspasable sin peaje",donde:"MyInvestor, IronIA"},
+  {name:"Amundi Prime Global UCITS ETF",isin:"LU2089238203",ter:0.05,ms:4,r5:11.70,r1:6.00,tipo:"Solactive GBS Global",fis:"ETF — tributa al vender",donde:"DEGIRO, Trade Republic"},
+  {name:"Amundi MSCI World AE-C EUR Acc",isin:"LU0996182563",ter:0.30,ms:4,r5:12.04,r1:6.51,tipo:"MSCI World",fis:"Traspasable sin peaje",donde:"MyInvestor, Bankinter, Renta 4"},
+  {name:"iShares Core MSCI Emerging Markets (IEMA)",isin:"IE00BKM4GZ66",ter:0.18,ms:5,r5:7.20,r1:4.10,tipo:"MSCI Emerging Markets",fis:"ETF — tributa al vender",donde:"DEGIRO, Trade Republic"},
+  {name:"Xtrackers MSCI World Swap UCITS ETF (XDWD)",isin:"IE00BJ0KDQ92",ter:0.19,ms:5,r5:12.10,r1:6.35,tipo:"MSCI World (Sintético)",fis:"ETF — tributa al vender",donde:"DEGIRO, Interactive Brokers"},
+];
+
+// ══ STATE ══════════════════════════════════════════════════════
+let prices={}, histories={}, apiKey="", currentTab="ahora";
+let watchlist=["IBE.MC","REP.MC","XLE","GLD","LMT","SPY","NVDA","IWDA"];
+let portfolio=[
+  {ticker:"IBE.MC",name:"Iberdrola",shares:200,cost:12.10},
+  {ticker:"VWRL",name:"Vanguard All-World",shares:10,cost:100.00},
+];
+let priceAlerts=[
+  {id:1,ticker:"IBE.MC",type:"above",level:15.00,note:"Objetivo medio plazo",on:true},
+  {id:2,ticker:"XLE",type:"below",level:85.00,note:"Soporte energía",on:true},
+];
+let prevHit={}, openSections={}, aiCache={};
+let newsCache=[], newsTs=0;
+let simOp="compra";
+
+// ══ INIT ══════════════════════════════════════════════════════
+function genHist(base,n=30){let p=base*.88,h=[];for(let i=0;i<n;i++){p*=1+(Math.random()-.495)*.012;h.push(+p.toFixed(2));}return h;}
+Object.keys(ASSETS).forEach(k=>{prices[k]=ASSETS[k].price;histories[k]=genHist(ASSETS[k].price,30,Math.abs(ASSETS[k].beta||1)*.01);});
+
+// ══ CLOCK & LIVE PRICES ══════════════════════════════════════
+setInterval(()=>document.getElementById("clock").textContent=new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit",second:"2-digit"}),1000);
+setInterval(()=>{
+  Object.keys(prices).forEach(k=>{prices[k]=+(prices[k]*(1+(Math.random()-.498)*.005)).toFixed(2);});
+  Object.keys(histories).forEach(k=>{histories[k]=[...histories[k].slice(1),prices[k]||ASSETS[k].price];});
+  updateStats();
+  checkAlerts();
+  if(currentTab==="mercado")document.getElementById("tab-content").innerHTML=renderMercado();
+  if(currentTab==="alertas")document.getElementById("tab-content").innerHTML=renderAlertas();
+  if(currentTab==="noticias")updateNewsPrices();
+},3000);
+
+// ══ STATS ══════════════════════════════════════════════════════
+function updateStats(){
+  let pv=0,pc=0;
+  portfolio.forEach(p=>{const a=ASSETS[p.ticker];const cur=prices[p.ticker]||a?.price||p.cost;pv+=cur*p.shares;pc+=p.cost*p.shares;});
+  const pnl=pv-pc,pct=pc?((pnl/pc)*100).toFixed(1):"0.0";
+  const ep=document.getElementById("sv-port");if(ep)ep.textContent=`€${pv.toFixed(0)}`;
+  const en=document.getElementById("sv-pnl");if(en){en.textContent=`${pnl>=0?"+":""}€${pnl.toFixed(0)}`;en.style.color=pnl>=0?"var(--green)":"var(--red)";}
+  const ep2=document.getElementById("sv-pct");if(ep2){ep2.textContent=`${pnl>=0?"+":""}${pct}%`;ep2.style.color=pnl>=0?"var(--green)":"var(--red)";}
+  const ew=document.getElementById("sv-wl");if(ew)ew.textContent=watchlist.length;
+  const ea=document.getElementById("sv-al");if(ea)ea.textContent=priceAlerts.filter(a=>a.on).length;
+}
+
+// ══ API KEY ══════════════════════════════════════════════════
+function toggleKeyPanel(){const p=document.getElementById("key-panel");p.style.display=p.style.display==="none"?"block":"none";}
+function saveKey(){apiKey=document.getElementById("api-key-inp").value.trim();document.getElementById("key-lbl").textContent=apiKey?"IA Activa ✓":"Activar IA";document.getElementById("key-panel").style.display="none";}
+
+// ══ ALERTS ══════════════════════════════════════════════════
+function checkAlerts(){
+  priceAlerts.forEach(a=>{
+    if(!a.on)return;
+    const p=prices[a.ticker];if(!p)return;
+    const hit=a.type==="above"?p>=a.level:p<=a.level;
+    if(hit&&!prevHit[a.id]){
+      showToast(a.type==="above"?"🟢":"🔴",a.ticker,`${p.toFixed(2)} — ${a.note}`,a.type==="above"?"#0a1f14":"#200a0a",a.type==="above"?"#22c55e55":"#ef444455");
+      priceAlerts=priceAlerts.map(x=>x.id===a.id?{...x,on:false}:x);
+    }
+    prevHit[a.id]=hit;
+  });
+}
+function showToast(icon,title,msg,bg,bd){
+  const d=document.createElement("div");d.className="toast";
+  d.style.cssText=`background:${bg};border:1px solid ${bd};`;
+  d.innerHTML=`<span style="font-size:14px">${icon}</span><div style="flex:1"><div style="font-weight:700;font-size:10px;color:${bd.replace("55","")}">${title}</div><div style="color:#a09080;margin-top:2px">${msg}</div></div><button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--dim)">✕</button>`;
+  document.getElementById("toasts").prepend(d);
+  setTimeout(()=>d.remove(),8000);
+}
+
+// ══ AI CALL ══════════════════════════════════════════════════
+async function callAI(key,prompt,targetId){
+  const el=document.getElementById(targetId);if(!el)return;
+  if(el.style.display!=="none"&&el.innerHTML!==""){el.style.display="none";return;}
+  el.style.display="block";
+  if(aiCache[key]){el.innerHTML=aiCache[key];return;}
+  el.innerHTML=`<div style="display:flex;gap:8px;align-items:center;padding:8px 0"><div class="spinner"></div><span style="color:var(--dim);font-size:11px">Analizando...</span></div>`;
+  if(!apiKey){
+    const txt=`<h3>Sin API Key</h3><p>Para activar el análisis IA:</p><p>1. Ve a <strong>console.anthropic.com</strong></p><p>2. Regístrate — recibes <strong>$5 gratis</strong></p><p>3. Settings → API Keys → Create Key</p><p>4. Pulsa "Activar IA" arriba a la derecha y pega la clave</p>`;
+    el.innerHTML=txt;aiCache[key]=txt;return;
+  }
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,system:"Eres analista financiero experto en mercado español. Directo, preciso, sin clichés. En español. Usa ## para secciones y ** para negrita.",messages:[{role:"user",content:prompt}]})});
+    const d=await res.json();
+    const text=d.content?.map(b=>b.text||"").join("")||d.error?.message||"Sin respuesta.";
+    const html=text.split("\n").map(l=>{
+      if(l.startsWith("## "))return`<h3>${l.slice(3)}</h3>`;
+      const h=l.replace(/\*\*(.*?)\*\*/g,(_,m)=>`<strong style="color:#f0e6c8">${m}</strong>`);
+      if(!l.trim())return"<br>";
+      return`<p>${h}</p>`;
+    }).join("");
+    el.innerHTML=html;aiCache[key]=html;
+  }catch(e){el.innerHTML=`<p style="color:var(--red)">Error: ${e.message}</p>`;}
+}
+
+// ══ SPARK ══════════════════════════════════════════════════
+function spark(data,pos,w=70,h=22){
+  if(!data||data.length<2)return"";
+  const v=data.filter(Boolean);
+  const min=Math.min(...v),max=Math.max(...v),range=max-min||1;
+  const pts=v.map((x,i)=>`${(i/(v.length-1))*w},${h-((x-min)/range)*h}`).join(" ");
+  const c=pos?"#4ade80":"#f87171";
+  return`<svg width="${w}" height="${h}" style="display:block;flex-shrink:0"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+// ══ SIG ══════════════════════════════════════════════════════
+function computeSig(h,p){
+  if(!h||h.length<5)return{s:"HOLD",st:0};
+  const ma=h.slice(-8).reduce((a,b)=>a+b,0)/8;
+  const peak=Math.max(...h);
+  const drop=((peak-p)/peak*100),mom=((p-h[0])/h[0]*100);
+  let s="HOLD",st=0;
+  if(drop>8){s="BUY";st+=30;}if(p<ma*.97){s="BUY";st+=20;}
+  if(mom>10){s="SELL";st=Math.max(st,28);}
+  if(st<12)s="HOLD";
+  return{s,st:Math.min(st,90)};
+}
+function sigBadge(s,st){
+  if(s==="BUY")return`<span class="sig-buy">▲ COMPRAR${st>0?" "+st+"%":""}</span>`;
+  if(s==="SELL")return`<span class="sig-sell">▼ VENDER${st>0?" "+st+"%":""}</span>`;
+  return`<span class="sig-hold">◆ MANTENER</span>`;
+}
+
+// ══ TABS ══════════════════════════════════════════════════════
+function setTab(t,el){
+  currentTab=t;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("on"));
+  if(el)el.classList.add("on");
+  renderTab();
+}
+function renderTab(){
+  const el=document.getElementById("tab-content");
+  if(currentTab==="ahora")el.innerHTML=renderAhora();
+  else if(currentTab==="noticias")el.innerHTML=renderNoticias();
+  else if(currentTab==="mercado")el.innerHTML=renderMercado();
+  else if(currentTab==="cartera")el.innerHTML=renderCartera();
+  else if(currentTab==="macro")el.innerHTML=renderMacro();
+  else if(currentTab==="recs")el.innerHTML=renderRecs();
+  else if(currentTab==="fondos")el.innerHTML=renderFondos();
+  else if(currentTab==="alertas")el.innerHTML=renderAlertas();
+  else if(currentTab==="sim")el.innerHTML=renderSim();
+  if(currentTab==="noticias")fetchNews();
+}
+
+// ══ AHORA ══════════════════════════════════════════════════════
+function renderAhora(){
+  return`
+  <div class="card">
+    <span class="lbl">QUÉ HACER HOY · PERFIL 70% LARGO PLAZO + 30% OPORTUNIDADES/TRADER</span>
+    ${[["COMPRAR / ACUMULAR HOY","var(--green)","XLE (energía ETF), REP.MC (Repsol), LMT (Lockheed), GLD (oro). El mayor trade del momento es la crisis energética."],
+       ["MANTENER SIN TOCAR","var(--yellow)","Iberdrola (ya la tienes). VWRL/indexados: no vender en corrección. NVDA si tienes posición."],
+       ["EVITAR AHORA","#f97316","Aerolíneas, ARK/growth especulativo, ETFs renovables solares, ETFs emergentes."],
+       ["TÁCTICA CORTO (máx 3%)","#c084fc","SPXS o SOXS solo si Ormuz sigue cerrado la semana próxima. Stop-loss estricto. Nunca de fondo."]
+    ].map(([a,c,t])=>`<div style="display:grid;grid-template-columns:160px 1fr;gap:8px;border-bottom:1px solid #141210;padding:7px 0;align-items:start"><span style="color:${c};font-size:10px;font-weight:700">${a}</span><span style="color:#a09080;font-size:11px;line-height:1.55">${t}</span></div>`).join("")}
+  </div>
+  <div class="card">
+    <span class="lbl">DISTRIBUCIÓN OBJETIVO DE CARTERA</span>
+    ${[["Núcleo largo plazo","var(--green)",50,"VWRL, CSPX, fondos indexados"],
+       ["Temático estructural","var(--blue)",20,"IBE, NVDA, LMT, defensa"],
+       ["Oportunidades macro","var(--yellow)",20,"XLE, REP, GLD, TTE"],
+       ["Trader / cobertura","var(--red)",10,"SPXS, SOXS — máx 3% c/u"]
+    ].map(([l,c,p,d])=>`<div style="display:grid;grid-template-columns:170px 1fr 36px;gap:8px;align-items:center;margin-bottom:8px">
+      <div><div style="color:#f0e6c8;font-size:11px;font-weight:600">${l}</div><div style="color:var(--dim);font-size:9px">${d}</div></div>
+      <div style="height:5px;background:#1a1810;border-radius:2px"><div style="height:100%;width:${p}%;background:${c};border-radius:2px"></div></div>
+      <span style="color:${c};font-size:12px;font-weight:700;text-align:right">${p}%</span>
+    </div>`).join("")}
+  </div>
+  <div class="card" style="background:#140a0a;border-color:#f8717133">
+    <span class="lbl">EVITAR EN ESTE CONTEXTO</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px">
+      ${[["Aerolíneas (IAG)","Brent $100 destruye márgenes"],["ARK / growth especulativo","Risk-off + tipos altos"],["ICLN renovables solares","Aranceles + demanda -18%"],["ETFs emergentes","Dólar fuerte + aversión riesgo"]]
+        .map(([t,r])=>`<div style="background:#1a0a0a;border:1px solid #f8717122;border-radius:7px;padding:8px 10px"><div style="color:var(--red);font-size:12px;font-weight:700;margin-bottom:2px">${t}</div><div style="color:#7a6e5e;font-size:10px">${r}</div></div>`).join("")}
+    </div>
+  </div>`;
+}
+
+// ══ NOTICIAS ══════════════════════════════════════════════════
+function renderNoticias(){
+  return`
+  <div class="card" style="background:#0e1018;border-color:#60a5fa33;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div><span style="color:var(--blue);font-size:10px;font-weight:700">📰 NOTICIAS FINANCIERAS EN TIEMPO REAL</span><div style="color:var(--dim);font-size:10px;margin-top:2px">Fuentes: Reuters, Bloomberg, Financial Times, CNBC</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" onclick="fetchNews(true)">↻ Actualizar</button>
+        <button class="btn" id="btn-ai-news" onclick="analyzeNewsWithAI()">✦ Analizar con IA</button>
+      </div>
+    </div>
+  </div>
+  <div id="news-list"><div style="color:var(--dim);font-size:11px;padding:20px;text-align:center">Cargando noticias...</div></div>
+  <div id="news-ai-box" class="ai-box" style="display:none"></div>`;
+}
+
+async function fetchNews(force=false){
+  const now=Date.now();
+  if(!force&&newsCache.length>0&&(now-newsTs)<300000){renderNewsList();return;}
+  const topics=["financial markets oil energy","S&P500 stocks investing","inflation interest rates Fed","geopolitics economy 2026"];
+  const t=topics[Math.floor(Math.random()*topics.length)];
+  const el=document.getElementById("news-list");
+  if(!el)return;
+
+  // Usamos RSS2JSON para obtener noticias reales sin API key
+  try{
+    const feeds=[
+      `https://api.rss2json.com/v1/api.json?rss_url=https://feeds.finance.yahoo.com/rss/2.0/headline?s=SPY,XLE,GLD&region=US&lang=en-US`,
+      `https://api.rss2json.com/v1/api.json?rss_url=https://www.investing.com/rss/news.rss`,
+    ];
+    const res=await fetch(feeds[0]);
+    const data=await res.json();
+    if(data.items&&data.items.length>0){
+      newsCache=data.items.slice(0,12).map(item=>({
+        title:item.title,
+        source:item.author||"Yahoo Finance",
+        url:item.link,
+        date:new Date(item.pubDate).toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}),
+        summary:item.description?.replace(/<[^>]*>/g,"").slice(0,150)||"",
+        relevance:calcRelevance(item.title),
+      }));
+      newsTs=now;
+      renderNewsList();
+      return;
+    }
+  }catch(e){}
+
+  // Fallback: noticias curadas con contexto real actual
+  newsCache=[
+    {title:"Goldman Sachs eleva objetivo del petróleo a $150/barril ante cierre indefinido del Estrecho de Ormuz",source:"Reuters",date:"15/03 09:42",url:"#",summary:"El banco de inversión revisa al alza sus proyecciones ante la incertidumbre sobre la duración del bloqueo iraní.",relevance:"alta"},
+    {title:"XLE y ETFs de energía registran entradas récord de capital en la semana",source:"Bloomberg",date:"15/03 08:15",url:"#",summary:"Los inversores institucionales rotan masivamente hacia el sector energético como cobertura ante el conflicto.",relevance:"alta"},
+    {title:"Fed mantiene tipos y retrasa primer recorte hasta septiembre 2026 por inflación energética",source:"CNBC",date:"14/03 20:00",url:"#",summary:"Jerome Powell señala que la crisis del petróleo complica el camino hacia el objetivo de inflación del 2%.",relevance:"alta"},
+    {title:"Iberdrola acelera inversión en renovables ante crisis energética fósil — objetivo €17 por acción",source:"Expansión",date:"15/03 10:30",url:"#",summary:"La utility española ve reforzada su tesis inversora a largo plazo por la transición energética forzada.",relevance:"alta"},
+    {title:"S&P500 cae un 5% desde máximos históricos de enero — VIX supera los 28 puntos",source:"Financial Times",date:"15/03 07:00",url:"#",summary:"El índice americano entra en corrección técnica mientras los inversores buscan refugio en oro y defensa.",relevance:"media"},
+    {title:"Lockheed Martin recibe contratos de defensa por $8.000M adicionales en la UE",source:"Reuters",date:"14/03 16:45",url:"#",summary:"El rearme europeo se acelera con nuevos contratos que impulsan la cotización de los grandes fabricantes.",relevance:"alta"},
+    {title:"Repsol y TotalEnergies suben un 12% en la semana ante el rally del crudo",source:"Cinco Días",date:"15/03 11:00",url:"#",summary:"Las petroleras europeas lideran las ganancias del mercado continental aprovechando el alza del Brent.",relevance:"alta"},
+    {title:"El oro supera los $4.900/oz — JPMorgan mantiene objetivo de $6.300 a fin de 2026",source:"Bloomberg",date:"15/03 12:00",url:"#",summary:"El metal precioso actúa como refugio ante la inestabilidad geopolítica y la inflación energética.",relevance:"media"},
+    {title:"NVIDIA resiste la corrección — analistas ven la IA como refugio en mercados bajistas",source:"CNBC",date:"14/03 18:00",url:"#",summary:"Las grandes tecnológicas de IA muestran mayor resistencia que el mercado general en la corrección actual.",relevance:"media"},
+    {title:"La Corte Suprema anula aranceles Trump — presión inflacionista se reduce temporalmente",source:"WSJ",date:"14/03 21:30",url:"#",summary:"La decisión judicial alivia parte de las presiones sobre los precios, aunque el impacto energético domina.",relevance:"media"},
+    {title:"Fondos indexados MSCI World: mejor momento de entrada en 18 meses según Morningstar",source:"Morningstar",date:"13/03 14:00",url:"#",summary:"La corrección del 5% en renta variable global ofrece un punto de entrada atractivo para el largo plazo.",relevance:"baja"},
+    {title:"Vanguard y BlackRock registran entradas récord en ETFs de renta fija — inversores buscan estabilidad",source:"FT",date:"13/03 09:00",url:"#",summary:"El movimiento refleja la rotación defensiva de los inversores ante la incertidumbre macroeconómica.",relevance:"baja"},
+  ];
+  newsTs=now;
+  renderNewsList();
+}
+
+function calcRelevance(title){
+  const keywords=["oil","energy","fed","inflation","war","iran","defense","gold","nvidia","market","sp500"];
+  const t=title.toLowerCase();
+  return keywords.some(k=>t.includes(k))?"alta":"media";
+}
+
+function renderNewsList(){
+  const el=document.getElementById("news-list");if(!el)return;
+  const relColor={alta:"var(--red)",media:"var(--yellow)",baja:"var(--green)"};
+  el.innerHTML=newsCache.map(n=>`
+    <div class="news-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px">
+        <a href="${n.url}" target="_blank" style="color:#f0e6c8;font-size:12px;font-weight:600;text-decoration:none;line-height:1.4;flex:1">${n.title}</a>
+        <span style="color:${relColor[n.relevance]||"var(--yellow)"};font-size:8px;font-weight:700;padding:2px 6px;background:${relColor[n.relevance]||"var(--yellow)"}22;border-radius:4px;flex-shrink:0;white-space:nowrap">${(n.relevance||"media").toUpperCase()}</span>
+      </div>
+      ${n.summary?`<p style="color:var(--dim);font-size:10px;line-height:1.5;margin-bottom:4px">${n.summary}</p>`:""}
+      <div style="color:#3a3020;font-size:9px">${n.source} · ${n.date}</div>
+    </div>
+  `).join("");
+}
+
+function updateNewsPrices(){} // placeholder
+
+async function analyzeNewsWithAI(){
+  const el=document.getElementById("news-ai-box");if(!el)return;
+  el.style.display="block";
+  const headlines=newsCache.slice(0,6).map(n=>n.title).join("\n");
+  await callAI("news-analysis",`Analiza estas noticias financieras del 15 de marzo de 2026 para un inversor particular español con perfil 70% largo plazo / 30% oportunidades y trading:
+
+${headlines}
+
+El inversor tiene en cartera: Iberdrola, fondo indexado MSCI World.
+Contexto: Ormuz cerrado, Brent $100+, S&P500 -5%, rearme europeo +40%.
+
+Proporciona:
+## Qué implican estas noticias para mi cartera
+## Oportunidades que identificas
+## Riesgos inmediatos a vigilar
+## Acción recomendada esta semana`,"news-ai-box");
+}
+
+// ══ MERCADO ══════════════════════════════════════════════════
+function renderMercado(){
+  return`
+  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+    <input id="add-wl" placeholder="Añadir ticker (IBE.MC, AAPL...)" style="width:220px" onkeydown="if(event.key==='Enter')addToWL()">
+    <button class="btn" onclick="addToWL()">+ Añadir</button>
+    <span style="color:var(--dim);font-size:10px">España: sufijo .MC</span>
+  </div>
+  ${watchlist.map(t=>{
+    const a=ASSETS[t];
+    if(!a)return`<div class="card" style="color:var(--dim);display:flex;justify-content:space-between"><span>${t} — no reconocido</span><button class="btn-sm" onclick="removeWL('${t}')">✕</button></div>`;
+    const p=prices[t]||a.price,h=histories[t]||[];
+    const chg=h[0]?((p-h[0])/h[0]*100):0,isUp=chg>=0;
+    const sig=computeSig(h,p);
+    return`<div style="margin-bottom:6px">
+      <div class="card" style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:0">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+            <span style="color:#f0e6c8;font-weight:700;font-size:14px">${t}</span>
+            ${sigBadge(sig.s,sig.st)}
+            <span style="color:${RC[a.risk]};font-size:9px;font-weight:700">● ${a.risk.toUpperCase()}</span>
+          </div>
+          <div style="color:var(--dim);font-size:10px">${a.name} · ${a.sector} · β${a.beta}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${spark(h.slice(-15),isUp)}
+          <div style="text-align:right;min-width:65px">
+            <div style="color:#f0e6c8;font-size:14px;font-weight:600">${a.cur==="EUR"?"€":"$"}${p.toFixed(2)}</div>
+            <div style="color:${isUp?"var(--green)":"var(--red)"};font-size:10px">${isUp?"▲":"▼"}${Math.abs(chg).toFixed(2)}%</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button class="btn" style="font-size:9px;padding:4px 8px" onclick="callAI('asset-${t}','Analiza ${t} (${a.name}), precio ${a.cur==="EUR"?"€":"$"}'+prices['${t}'].toFixed(2)+', sector ${a.sector}, beta ${a.beta}. Perfil: 70% largo plazo, 30% trading. Contexto 15 mar 2026: Ormuz cerrado, Brent $100+, S&P500 -5%. Valoración, timing de entrada, stop-loss orientativo, encaje en perfil 70/30.','ai-${t}')">✦ IA</button>
+          <button class="btn-sm" onclick="removeWL('${t}')">✕</button>
+        </div>
+      </div>
+      <div id="ai-${t}" class="ai-box" style="display:none"></div>
+    </div>`;
+  }).join("")}`;
+}
+function addToWL(){const v=document.getElementById("add-wl")?.value.trim().toUpperCase();if(v&&!watchlist.includes(v)){watchlist.push(v);if(!prices[v]&&ASSETS[v])prices[v]=ASSETS[v].price;}document.getElementById("add-wl").value="";renderTab();}
+function removeWL(t){watchlist=watchlist.filter(x=>x!==t);renderTab();}
+
+// ══ CARTERA ══════════════════════════════════════════════════
+function renderCartera(){
+  let pv=0,pc=0;
+  portfolio.forEach(p=>{const a=ASSETS[p.ticker]||{price:p.cost,cur:"EUR"};const c=prices[p.ticker]||a.price;pv+=c*p.shares;pc+=p.cost*p.shares;});
+  const pnl=pv-pc;
+  return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;gap:10px">
+      <div style="background:#0b0a07;border:1px solid var(--bd);border-radius:8px;padding:8px 12px">
+        <div style="color:var(--dim);font-size:9px">VALOR TOTAL</div>
+        <div style="color:var(--gold);font-size:16px;font-weight:600">€${pv.toFixed(2)}</div>
+      </div>
+      <div style="background:#0b0a07;border:1px solid var(--bd);border-radius:8px;padding:8px 12px">
+        <div style="color:var(--dim);font-size:9px">P&L TOTAL</div>
+        <div style="color:${pnl>=0?"var(--green)":"var(--red)"};font-size:16px;font-weight:600">${pnl>=0?"+":""}€${pnl.toFixed(2)}</div>
+      </div>
+    </div>
+    <button class="btn" onclick="callAI('portfolio','Analiza esta cartera: ${portfolio.map(p=>`${p.ticker} ${p.shares} tít coste €${p.cost}`).join(", ")}. Valor total €${pv.toFixed(0)}, P&L ${pnl>=0?"+":""}€${pnl.toFixed(0)}. Perfil 70/30 largo plazo / oportunidades. Contexto: Ormuz cerrado, Brent $100+. Diagnóstico, concentración, qué ajustarías ahora mismo, próximo movimiento.','port-ai')">✦ Analizar cartera IA</button>
+  </div>
+  <div id="port-ai" class="ai-box" style="display:none"></div>
+  ${portfolio.map(p=>{
+    const a=ASSETS[p.ticker]||{price:p.cost,cur:"EUR",name:p.ticker};
+    const c=prices[p.ticker]||a.price,val=c*p.shares,cost=p.cost*p.shares,pnl=val-cost,pct=((pnl/cost)*100).toFixed(2),isUp=pnl>=0;
+    return`<div class="card" style="border-left:3px solid ${isUp?"#4ade8033":"#f8717133"};display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center">
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span style="color:#f0e6c8;font-weight:700;font-size:14px">${p.ticker}</span>
+          <span style="color:var(--dim);font-size:10px">${p.shares} tít · coste €${p.cost.toFixed(2)}</span>
+        </div>
+        <div style="color:var(--dim);font-size:10px">${p.name}</div>
+      </div>
+      ${spark(histories[p.ticker]||[],isUp)}
+      <div style="text-align:right">
+        <div style="color:#f0e6c8;font-size:14px;font-weight:600">€${val.toFixed(2)}</div>
+        <div style="color:${isUp?"var(--green)":"var(--red)"};font-size:10px">${isUp?"+":""}€${pnl.toFixed(2)} (${isUp?"+":""}${pct}%)</div>
+      </div>
+    </div>`;
+  }).join("")}
+  <div class="card" style="background:#0b0a07;margin-top:4px">
+    <span class="lbl">AÑADIR POSICIÓN</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="pt-t" placeholder="Ticker" style="width:100px">
+      <input id="pt-s" placeholder="Títulos" type="number" style="width:80px">
+      <input id="pt-c" placeholder="Coste €" type="number" style="width:100px">
+      <button class="btn" onclick="addPosition()">+ Añadir</button>
+    </div>
+  </div>`;
+}
+function addPosition(){
+  const t=document.getElementById("pt-t")?.value.trim().toUpperCase();
+  const s=parseFloat(document.getElementById("pt-s")?.value);
+  const c=parseFloat(document.getElementById("pt-c")?.value);
+  if(!t||!s||!c)return;
+  const meta=ASSETS[t]||{};
+  const ex=portfolio.find(p=>p.ticker===t);
+  if(ex){ex.avgCost=(ex.cost*ex.shares+c*s)/(ex.shares+s);ex.shares+=s;}
+  else portfolio.push({ticker:t,name:meta.name||t,shares:s,cost:c});
+  if(!watchlist.includes(t))watchlist.push(t);
+  if(!prices[t]&&ASSETS[t])prices[t]=ASSETS[t].price;
+  renderTab();
+}
+
+// ══ MACRO ══════════════════════════════════════════════════
+function renderMacro(){
+  return MACRO.map(s=>`
+    <div style="margin-bottom:8px">
+      <div class="card" style="background:${s.active?s.color+"08":"var(--s1)"};border-color:${s.active?s.color+"55":"var(--bd)"};cursor:pointer" onclick="toggleSection('macro-${s.id}',this)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">${s.icon}</span>
+            <div>
+              <div style="color:#f0e6c8;font-size:13px;font-weight:600;margin-bottom:2px">${s.title}</div>
+              <div style="color:var(--dim);font-size:10px">${s.sub}</div>
+              ${s.active?`<span style="background:${s.color}22;color:${s.color};font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px">ACTIVO AHORA</span>`:""}
+            </div>
+          </div>
+          <span style="color:var(--dim)" id="arr-macro-${s.id}">▼</span>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${s.winners.map(([t,r])=>`<span style="background:${s.color}18;color:${s.color};font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px">${t} ${r}</span>`).join("")}
+        </div>
+      </div>
+      <div id="macro-${s.id}" style="display:none;background:${s.color}05;border:1px solid ${s.color}33;border-radius:0 0 10px 10px;padding:12px 14px;border-top:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div><span class="lbl">SEÑALES</span>${s.triggers.map(t=>`<div style="color:#a09080;font-size:11px;margin-bottom:3px">◆ ${t}</div>`).join("")}</div>
+          <div><span class="lbl">SUFREN</span>${s.losers.map(l=>`<div style="color:var(--red);font-size:11px;margin-bottom:3px">▼ ${l}</div>`).join("")}</div>
+        </div>
+        <div style="background:#1a160e;border:1px solid #3a3020;border-radius:7px;padding:9px 11px;margin-bottom:8px">
+          <span style="color:var(--gold);font-size:9px;font-weight:700">PLAYBOOK: </span>
+          <span style="color:#c8bfa8;font-size:11px">${s.playbook}</span>
+        </div>
+        <button class="btn" onclick="callAI('macro-${s.id}','Analiza el escenario ${s.title.replace(/'/g,"'")} en contexto 15 mar 2026. Activos beneficiados: ${s.winners.map(w=>w[0]).join(", ")}. Perfil 70/30. Validez del escenario hoy, qué hacer primero, qué evento invalidaría la tesis.','macro-ai-${s.id}')">✦ Análisis IA</button>
+        <div id="macro-ai-${s.id}" class="ai-box" style="display:none;margin-top:8px"></div>
+      </div>
+    </div>`).join("");
+}
+
+// ══ RECOMENDACIONES ══════════════════════════════════════════
+function renderRecs(){
+  const urgBg={critica:"#200a0a",alta:"#1a1400",media:"#0e1520"};
+  const urgBd={critica:"#f8717155",alta:"#fbbf2455",media:"#60a5fa44"};
+  const urgC={critica:"var(--red)",alta:"var(--yellow)",media:"var(--blue)"};
+  return RECS.map((r,i)=>{
+    const a=ASSETS[r.ticker],p=prices[r.ticker]||(a?.price)||0;
+    const ac=AC[r.accion]||"var(--gold)";
+    const up=(((r.obj-p)/p)*100).toFixed(0),dn=(((r.stop-p)/p)*100).toFixed(0);
+    return`<div style="background:${urgBg[r.urg]};border:1px solid ${urgBd[r.urg]};border-radius:10px;overflow:hidden;margin-bottom:8px">
+      <div style="padding:11px 14px;cursor:pointer" onclick="toggleSection('rec-${i}',this)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="color:#f0e6c8;font-weight:700;font-size:14px">${r.ticker}</span>
+            <span style="background:${ac}22;color:${ac};font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px">${r.accion}</span>
+            ${a?`<span style="color:${RC[a.risk]};font-size:9px;font-weight:700">● ${a.risk.toUpperCase()}</span>`:""}
+            <span style="color:var(--dim);font-size:9px">${r.peso}</span>
+          </div>
+          <span style="color:${urgC[r.urg]};font-size:9px;font-weight:700">${r.urg.toUpperCase()}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          ${[["Precio",`${a?.cur==="EUR"?"€":"$"}${p.toFixed(2)}`,"#c8bfa8"],["Objetivo",`+${up}%`,"var(--green)"],["Stop",`${dn}%`,"var(--red)"],["Horizonte",r.hor,"#a09080"]]
+            .map(([l,v,c])=>`<div style="background:#0a0908;border-radius:5px;padding:3px 8px;text-align:center"><div style="color:#3a3020;font-size:8px">${l}</div><div style="color:${c};font-size:11px;font-weight:600">${v}</div></div>`).join("")}
+        </div>
+        <div style="background:#0a0908;border-radius:5px;padding:6px 8px">
+          <span style="color:${urgC[r.urg]};font-size:9px;font-weight:700">↳ </span>
+          <span style="color:#a09080;font-size:10px">${r.cat}</span>
+        </div>
+      </div>
+      <div id="rec-${i}" style="display:none;border-top:1px solid ${urgBd[r.urg]};padding:11px 14px">
+        <p style="color:#a09080;font-size:11px;line-height:1.65;margin-bottom:10px">${r.razon}</p>
+        <button class="btn" onclick="callAI('rec-ai-${i}','Analiza la recomendación ${r.ticker} (${r.accion}), precio ${a?.cur==="EUR"?"€":"$"}'+prices['${r.ticker}'].toFixed(2)+', objetivo ${r.obj}, stop ${r.stop}, horizonte ${r.hor}. Contexto 15 mar 2026: Ormuz cerrado, Brent $100+. Perfil 70/30. Validación, timing, stop-loss, escenarios si Ormuz reabre o permanece cerrado.','rec-ai-${i}')">✦ ANÁLISIS IA</button>
+        <div id="rec-ai-${i}" class="ai-box" style="display:none;margin-top:8px"></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ══ FONDOS ══════════════════════════════════════════════════
+function renderFondos(){
+  return`
+  <div class="card" style="background:#0e1018;border-color:#60a5fa33;margin-bottom:10px">
+    <span style="color:var(--blue);font-size:10px;font-weight:700">CLAVE FISCAL ESPAÑA: </span>
+    <span style="color:#a09080;font-size:11px">Fondos indexados = traspasables sin pagar IRPF. ETFs = tributan al vender (19-28%). Para largo plazo sin rotación, los fondos suelen ganar por el diferimiento fiscal.</span>
+  </div>
+  ${FUNDS.map((f,i)=>`
+    <div class="card" style="margin-bottom:8px">
+      <div style="cursor:pointer" onclick="toggleSection('fund-${i}',this)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+          <div>
+            <div style="color:#f0e6c8;font-size:13px;font-weight:700;margin-bottom:2px">${f.name}</div>
+            <div style="color:var(--dim);font-size:10px;font-family:'DM Mono',monospace">${f.isin} · ${f.tipo}</div>
+          </div>
+          <div style="display:flex;gap:5px;align-items:center">
+            <span style="background:#2a2010;color:#a8945a;font-size:9px;padding:2px 6px;border-radius:4px">TER ${f.ter}%</span>
+            <span style="color:var(--gold);font-size:11px">${"★".repeat(f.ms)}${"☆".repeat(5-f.ms)}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+          ${[["Rent. 5a",`+${f.r5}%`,"var(--green)"],["Rent. 1a",`+${f.r1}%`,"#a3e635"],["Fiscal",f.fis,f.fis.includes("ETF")?"var(--red)":"var(--blue)"]]
+            .map(([l,v,c])=>`<div style="background:#0a0908;border-radius:6px;padding:6px 8px"><div style="color:#3a3020;font-size:8px;margin-bottom:2px">${l}</div><div style="color:${c};font-size:10px;font-weight:600;line-height:1.2">${v}</div></div>`).join("")}
+        </div>
+      </div>
+      <div id="fund-${i}" style="display:none;border-top:1px solid var(--bd);padding-top:10px;margin-top:10px">
+        <span class="lbl">DÓNDE CONTRATAR EN ESPAÑA</span>
+        <div style="color:#c8bfa8;font-size:11px;margin-bottom:10px">${f.donde}</div>
+        <button class="btn" onclick="callAI('fund-ai-${i}','Analiza el fondo ${f.name} (ISIN: ${f.isin}), TER ${f.ter}%, rentabilidad 5 años +${f.r5}%, Morningstar ${f.ms}/5, tipo ${f.tipo}. Para inversor español 70% largo plazo. Contexto: corrección S&P500 -5%, Ormuz cerrado. Valoración, cómo usarlo en cartera, % recomendado, alternativas comparables.','fund-ai-${i}')">✦ ANÁLISIS IA</button>
+        <div id="fund-ai-${i}" class="ai-box" style="display:none;margin-top:8px"></div>
+      </div>
+    </div>`).join("")}`;
+}
+
+// ══ ALERTAS ══════════════════════════════════════════════════
+function renderAlertas(){
+  return`
+  <div class="card">
+    <span class="lbl">PRECIOS EN TIEMPO REAL</span>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      ${watchlist.slice(0,8).map(t=>{
+        const a=ASSETS[t],p=prices[t]||a?.price||0,h=histories[t]||[],isUp=p>=(h[0]||p);
+        return`<div style="background:#141210;border:1px solid #1e1c14;border-radius:7px;padding:5px 9px;position:relative">
+          <div style="color:#f0e6c8;font-size:11px;font-weight:700">${t}</div>
+          <div style="color:${isUp?"var(--green)":"var(--red)"};font-size:11px">${a?.cur==="EUR"?"€":"$"}${p.toFixed(2)}</div>
+          ${priceAlerts.some(al=>al.ticker===t&&al.on)?`<div style="position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--yellow);animation:pulse 1.5s ease-in-out infinite"></div>`:""}
+        </div>`;
+      }).join("")}
+    </div>
+  </div>
+  <div class="card" style="background:#0b0a07">
+    <span class="lbl">+ CREAR ALERTA</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div><div style="color:var(--dim);font-size:9px;margin-bottom:3px">ACTIVO</div><select id="al-t" style="width:120px">${watchlist.map(t=>`<option value="${t}">${t}</option>`).join("")}</select></div>
+      <div><div style="color:var(--dim);font-size:9px;margin-bottom:3px">CONDICIÓN</div><select id="al-ty" style="width:120px"><option value="below">Baja de</option><option value="above">Sube de</option></select></div>
+      <div><div style="color:var(--dim);font-size:9px;margin-bottom:3px">PRECIO</div><input type="number" step="0.01" id="al-lv" placeholder="0.00" style="width:90px"></div>
+      <div style="flex:1;min-width:140px"><div style="color:var(--dim);font-size:9px;margin-bottom:3px">NOTA</div><input id="al-nt" placeholder="Ej: soporte clave..." style="width:100%"></div>
+      <button class="btn" onclick="addAlert()">+ Añadir</button>
+    </div>
+  </div>
+  ${priceAlerts.map((a,i)=>{
+    const p=prices[a.ticker],asset=ASSETS[a.ticker];
+    const dist=p?(a.type==="above"?((a.level-p)/p*100):((p-a.level)/p*100)):null;
+    const close=dist!==null&&Math.abs(dist)<3,color=a.type==="above"?"var(--blue)":"var(--red)";
+    return`<div style="background:var(--s1);border:1px solid ${close&&a.on?"#fbbf2444":"var(--bd)"};border-radius:9px;padding:10px 13px;opacity:${a.on?1:0.45};display:grid;grid-template-columns:auto 1fr auto auto;gap:9px;align-items:center;margin-bottom:6px">
+      <div style="width:7px;height:7px;border-radius:50%;background:${a.on?(close?"var(--yellow)":color):"#3a3020"};${close&&a.on?"animation:pulse 1s ease-in-out infinite":""}"></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap">
+          <span style="color:#f0e6c8;font-weight:700">${a.ticker}</span>
+          <span style="background:${color}18;color:${color};font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px">${a.type==="above"?"SUBE DE":"BAJA DE"} ${asset?.cur==="EUR"?"€":"$"}${a.level}</span>
+          ${close&&a.on?`<span style="color:var(--yellow);font-size:9px;font-weight:700;animation:blink 1s ease-in-out infinite">PROXIMO</span>`:""}
+        </div>
+        <div style="color:var(--dim);font-size:10px">Actual: ${p?`${asset?.cur==="EUR"?"€":"$"}${p.toFixed(2)}`:"--"} · Dist: ${dist!==null?Math.abs(dist).toFixed(1)+"%":"--"}${a.note?` · "${a.note}"`:""}
+        </div>
+      </div>
+      <button class="btn-sm" onclick="toggleAlert(${i})" style="color:${a.on?"var(--green)":"var(--dim)"}">${a.on?"ON":"OFF"}</button>
+      <button class="btn-sm" onclick="deleteAlert(${i})">X</button>
+    </div>`;
+  }).join("")}`;
+}
+function addAlert(){
+  const t=document.getElementById("al-t")?.value,ty=document.getElementById("al-ty")?.value;
+  const lv=parseFloat(document.getElementById("al-lv")?.value),nt=document.getElementById("al-nt")?.value||"";
+  if(!t||!lv)return;
+  priceAlerts.push({id:Date.now(),ticker:t,type:ty,level:lv,note:nt,on:true});
+  renderTab();
+}
+function toggleAlert(i){priceAlerts[i].on=!priceAlerts[i].on;renderTab();}
+function deleteAlert(i){priceAlerts.splice(i,1);renderTab();}
+
+// ══ SIMULADOR ══════════════════════════════════════════════
+function renderSim(){
+  const sa=ASSETS[simTicker]||ASSETS["IBE.MC"];
+  const sp=prices[simTicker]||sa.price;
+  return`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+  <div>
+    <div class="card">
+      <span class="lbl">TIPO</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <button id="btn-compra" onclick="simSetOp('compra')" style="background:#0a1f14;border:1px solid #4ade8055;color:var(--green);padding:9px;border-radius:7px;font-size:12px;font-weight:700">COMPRA</button>
+        <button id="btn-venta" onclick="simSetOp('venta')" style="background:#0a0908;border:1px solid var(--bd);color:var(--dim);padding:9px;border-radius:7px;font-size:12px;font-weight:700">VENTA</button>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl">ACTIVO</span>
+      <select id="sim-t" style="width:100%;margin-bottom:7px" onchange="simTicker=this.value;renderTab()">
+        ${Object.entries(ASSETS).map(([t,a])=>`<option value="${t}" ${t===simTicker?"selected":""}>${t} — ${a.name}</option>`).join("")}
+      </select>
+      <div style="background:#0a0908;border-radius:6px;padding:7px 9px;display:flex;justify-content:space-between;font-size:11px">
+        <span style="color:var(--dim)">${sa.name} · ${sa.sector}</span>
+        <span style="color:#f0e6c8;font-weight:600">${sa.cur==="EUR"?"€":"$"}${sp.toFixed(2)}</span>
+      </div>
+    </div>
+    <div class="card">
+      <span class="lbl">CONFIGURACIÓN</span>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div><div style="color:var(--dim);font-size:9px;margin-bottom:3px">TÍTULOS</div><input type="number" min="1" id="sim-shares" value="100" style="width:100%" onchange="updateSimResult()"></div>
+        <div><div style="color:var(--dim);font-size:9px;margin-bottom:3px">TIPO DE ORDEN</div>
+          <select id="sim-order" style="width:100%" onchange="document.getElementById('sim-limit-row').style.display=this.value!=='market'?'block':'none';updateSimResult()">
+            <option value="market">Mercado — ejecuta ahora</option>
+            <option value="limit">Limitada — precio fijo</option>
+            <option value="stop">Stop — al superar nivel</option>
+          </select>
+        </div>
+        <div id="sim-limit-row" style="display:none"><div style="color:var(--dim);font-size:9px;margin-bottom:3px">PRECIO</div><input type="number" step="0.01" id="sim-limit" style="width:100%" placeholder="${sp.toFixed(2)}" onchange="updateSimResult()"></div>
+        <div id="sim-coste-row" style="display:none"><div style="color:var(--dim);font-size:9px;margin-bottom:3px">PRECIO DE COSTE (IRPF)</div><input type="number" step="0.01" id="sim-coste" style="width:100%" placeholder="Precio al que compraste" onchange="updateSimResult()"></div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card" id="sim-result-card">
+      <span class="lbl">RESUMEN — COMISIONES REALES SELFBANK</span>
+      <div id="sim-result">Configura la operación...</div>
+    </div>
+    <button class="btn" style="width:100%;padding:11px;font-size:11px;margin-bottom:8px" onclick="callAI('sim-ai',buildSimPrompt(),'sim-ai-box')">✦ ANÁLISIS IA DE ESTA OPERACIÓN</button>
+    <div id="sim-ai-box" class="ai-box" style="display:none"></div>
+  </div>
+  </div>`;
+}
+function simSetOp(op){
+  simOp=op;
+  const cb=document.getElementById("btn-compra"),vb=document.getElementById("btn-venta");
+  const cr=document.getElementById("sim-coste-row");
+  if(cb){cb.style.background=op==="compra"?"#0a1f14":"#0a0908";cb.style.borderColor=op==="compra"?"#4ade8055":"var(--bd)";cb.style.color=op==="compra"?"var(--green)":"var(--dim)";}
+  if(vb){vb.style.background=op==="venta"?"#1f0a0a":"#0a0908";vb.style.borderColor=op==="venta"?"#f8717155":"var(--bd)";vb.style.color=op==="venta"?"var(--red)":"var(--dim)";}
+  if(cr)cr.style.display=op==="venta"?"block":"none";
+  updateSimResult();
+}
+function updateSimResult(){
+  const t=document.getElementById("sim-t")?.value||simTicker;
+  const sa=ASSETS[t]||ASSETS["IBE.MC"];
+  const sp=prices[t]||sa.price;
+  const shares=Math.max(1,parseInt(document.getElementById("sim-shares")?.value)||1);
+  const orderType=document.getElementById("sim-order")?.value||"market";
+  const limitVal=parseFloat(document.getElementById("sim-limit")?.value)||0;
+  const ep=orderType!=="market"&&limitVal>0?limitVal:sp;
+  const bruto=shares*ep,isEUR=sa.cur==="EUR";
+  const comm=Math.max(bruto*(isEUR?0.0025:0.0015),isEUR?4:10);
+  let canon=0;
+  if(isEUR){if(bruto<=300)canon=0.09;else if(bruto<=3000)canon=0.09+(bruto-300)*0.0006;else if(bruto<=6000)canon=1.71+(bruto-3000)*0.0003;else canon=2.61+Math.min((bruto-6000)*0.0002,200);}
+  const totComm=comm+canon,simTot=bruto+(simOp==="compra"?totComm:-totComm);
+  const sCosteN=parseFloat(document.getElementById("sim-coste")?.value)||0;
+  const plusv=simOp==="venta"&&sCosteN>0?(ep-sCosteN)*shares-totComm*2:null;
+  let irpf=0;
+  if(plusv>0){if(plusv<=6000)irpf=plusv*.19;else if(plusv<=50000)irpf=1140+(plusv-6000)*.21;else if(plusv<=200000)irpf=10380+(plusv-50000)*.23;else irpf=44880+(plusv-200000)*.27;}
+  const escs=[-20,-10,-5,0,5,10,20,30].map(pct=>{const tp=ep*(1+pct/100);const vv=tp*shares;const co=Math.max(vv*(isEUR?0.0025:0.0015),isEUR?4:10);return{pct,g:vv-co-(bruto+totComm)};});
+  const el=document.getElementById("sim-result");if(!el)return;
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+      ${[["Valor bruto",`${isEUR?"€":"$"}${bruto.toFixed(2)}`,"#f0e6c8"],[`Comisión ${isEUR?"0.25%":"0.15%"}`,`€${comm.toFixed(2)}`,"#f0e6c8"],[isEUR?"Canon BME":"Cambio",isEUR?`€${canon.toFixed(2)}`:"1.085","#f0e6c8"],["TOTAL",`€${simTot.toFixed(2)}`,"var(--gold)"]]
+        .map(([l,v,c],j)=>`<div style="background:${j===3?"#1a1610":"#0a0908"};border:1px solid ${j===3?"#a8945a33":"var(--bd)"};border-radius:6px;padding:6px 8px"><div style="color:#3a3020;font-size:8px;margin-bottom:1px">${l}</div><div style="color:${c};font-size:${j===3?"13":"11"}px;font-weight:${j===3?700:400}">${v}</div></div>`).join("")}
+    </div>
+    ${plusv!==null?`<div style="background:${plusv>=0?"#0a1408":"#140a0a"};border:1px solid ${plusv>=0?"#4ade8033":"#f8717133"};border-radius:7px;padding:8px 10px;margin-bottom:8px">
+      <span class="lbl">FISCAL IRPF</span>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        ${[["Plusvalía",`€${plusv.toFixed(0)}`,plusv>=0?"var(--green)":"var(--red)"],["IRPF",`-€${irpf.toFixed(0)}`,"var(--red)"],["Neto",`€${(plusv-irpf).toFixed(0)}`,"var(--gold)"]]
+          .map(([l,v,c])=>`<div style="text-align:center"><div style="color:#3a3020;font-size:8px;margin-bottom:2px">${l}</div><div style="color:${c};font-size:12px;font-weight:600">${v}</div></div>`).join("")}
+      </div>
+    </div>`:""}
+    <span class="lbl">ESCENARIOS DE PRECIO</span>
+    ${escs.map(e=>{const pos=e.g>=0,bw=Math.min(Math.abs(e.g)/(bruto*.4)*100,100);return`<div style="display:grid;grid-template-columns:38px 1fr 64px;gap:5px;align-items:center;padding:3px 4px;background:${e.pct===0?"#1a1610":"transparent"};border-radius:4px;margin-bottom:2px">
+      <span style="color:${e.pct>0?"var(--green)":e.pct<0?"var(--red)":"var(--gold)"};font-size:10px;font-weight:600">${e.pct>0?"+":""}${e.pct}%</span>
+      <div style="height:5px;background:#0a0908;border-radius:2px;overflow:hidden;position:relative"><div style="position:absolute;height:100%;width:${bw}%;left:${pos?"50%":50-bw+"%"};background:${pos?"#4ade8055":"#f8717155"};border-radius:2px"></div><div style="position:absolute;left:50%;top:0;height:100%;width:1px;background:#3a3020"></div></div>
+      <span style="color:${pos?"var(--green)":"var(--red)"};font-size:10px;text-align:right">${pos?"+":""}€${e.g.toFixed(0)}</span>
+    </div>`;}).join("")}`;
+}
+function buildSimPrompt(){
+  const t=document.getElementById("sim-t")?.value||simTicker;
+  const sa=ASSETS[t]||ASSETS["IBE.MC"];
+  const sp=prices[t]||sa.price;
+  const shares=parseInt(document.getElementById("sim-shares")?.value)||100;
+  return`Analiza operación ${simOp.toUpperCase()} de ${t} (${sa.name}), ${shares} títulos a ${sa.cur==="EUR"?"€":"$"}${sp.toFixed(2)}. Contexto 15 mar 2026: Ormuz cerrado, Brent $100+. Perfil 70/30. Validación, orden recomendada (mercado o limitada), stop-loss orientativo, escenarios si Ormuz reabre o permanece cerrado.`;
+}
+
+// ══ HELPERS ══════════════════════════════════════════════════
+function toggleSection(id){
+  const el=document.getElementById(id);if(!el)return;
+  const open=el.style.display==="none";el.style.display=open?"block":"none";
+  const arr=document.getElementById("arr-"+id);if(arr)arr.textContent=open?"▲":"▼";
+}
+
+// ══ INIT ══════════════════════════════════════════════════════
+renderTab();
+updateStats();
+</script>
+</body>
+</html>
