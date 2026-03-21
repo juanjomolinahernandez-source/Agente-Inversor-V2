@@ -177,8 +177,55 @@ let newsCache=[], newsTs=0;
 let simOp="compra";
 
 // ══ INIT ══════════════════════════════════════════════════════
-function genHist(base,n=30){let p=base*.88,h=[];for(let i=0;i<n;i++){p*=1+(Math.random()-.495)*.012;h.push(+p.toFixed(2));}return h;}
-Object.keys(ASSETS).forEach(k=>{prices[k]=ASSETS[k].price;histories[k]=genHist(ASSETS[k].price,30,Math.abs(ASSETS[k].beta||1)*.01);});
+function genHist(base,n=30){let p=(base||10)*.88,h=[];for(let i=0;i<n;i++){p*=1+(Math.random()-.495)*.012;h.push(+p.toFixed(2));}return h;}
+Object.keys(ASSETS).forEach(k=>{prices[k]=ASSETS[k].price;histories[k]=genHist(ASSETS[k].price);});
+
+// ══ REAL PRICES FROM YAHOO FINANCE ══════════════════════════
+let realPricesLoaded = false;
+
+async function fetchRealPrices() {
+  try {
+    const symbols = [...new Set([...watchlist, ...portfolio.map(p => p.ticker)])].join(',')
+    const res = await fetch(`/api/prices?symbols=${symbols}`)
+    const data = await res.json()
+    if (data.ok) {
+      Object.entries(data.data).forEach(([ticker, info]) => {
+        if (!info.error && info.price > 0) {
+          const oldPrice = prices[ticker] || info.price
+          prices[ticker] = info.price
+          // Update history with real data if available
+          if (info.history && info.history.length > 0) {
+            histories[ticker] = info.history
+          }
+          // Update asset metadata with real name
+          if (ASSETS[ticker]) {
+            ASSETS[ticker].name = info.name || ASSETS[ticker].name
+            ASSETS[ticker].cur = info.currency === 'EUR' ? 'EUR' : 'USD'
+          } else {
+            ASSETS[ticker] = {
+              name: info.name || ticker,
+              risk: 'medio', price: info.price,
+              cur: info.currency === 'EUR' ? 'EUR' : 'USD',
+              sector: info.exchange || 'Market', beta: 1
+            }
+          }
+        }
+      })
+      realPricesLoaded = true
+      updateStats()
+      if (currentTab === 'mercado' || currentTab === 'cartera' || currentTab === 'alertas') renderTab()
+      // Update last update indicator
+      const ck = document.getElementById('clock')
+      if (ck) ck.style.color = '#4ade80'
+    }
+  } catch (e) {
+    console.log('Yahoo Finance unavailable, using simulated prices')
+  }
+}
+
+// Fetch real prices on load and every 60 seconds
+fetchRealPrices()
+setInterval(fetchRealPrices, 60000)
 
 // ══ CLOCK & LIVE PRICES ══════════════════════════════════════
 setInterval(()=>document.getElementById("clock").textContent=new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit",second:"2-digit"}),1000);
@@ -442,9 +489,9 @@ Proporciona:
 function renderMercado(){
   return`
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
-    <input id="add-wl" placeholder="Añadir ticker (IBE.MC, AAPL...)" style="width:220px" onkeydown="if(event.key==='Enter')addToWL()">
+    <input id="add-wl" placeholder="Ticker, nombre o ISIN (ej: IBE.MC, Apple, IE00B03HD191)" style="width:320px" onkeydown="if(event.key==='Enter')addToWL()">
     <button class="btn" onclick="addToWL()">+ Añadir</button>
-    <span style="color:var(--dim);font-size:10px">España: sufijo .MC</span>
+    <span style="color:var(--dim);font-size:10px">España: sufijo .MC · Precio real Yahoo Finance cada 60s</span>
   </div>
   ${watchlist.map(t=>{
     const a=ASSETS[t];
@@ -478,7 +525,84 @@ function renderMercado(){
     </div>`;
   }).join("")}`;
 }
-function addToWL(){const v=document.getElementById("add-wl")?.value.trim().toUpperCase();if(v&&!watchlist.includes(v)){watchlist.push(v);if(!prices[v]&&ASSETS[v])prices[v]=ASSETS[v].price;}document.getElementById("add-wl").value="";renderTab();}
+async function addToWL(){
+  const raw=document.getElementById("add-wl")?.value.trim();
+  if(!raw)return;
+  const v=raw.toUpperCase();
+  document.getElementById("add-wl").value="";
+
+  // Si ya existe en watchlist, ignorar
+  if(watchlist.includes(v))return;
+
+  // Si es un ISIN (12 caracteres alfanuméricos), buscar ticker en Yahoo
+  const isISIN=/^[A-Z]{2}[A-Z0-9]{10}$/.test(v);
+  const isKnown=!!ASSETS[v];
+
+  if(isKnown){
+    watchlist.push(v);
+    prices[v]=ASSETS[v].price;
+    histories[v]=genHist(ASSETS[v].price);
+    renderTab();
+    return;
+  }
+
+  // Buscar en Yahoo Finance por ticker o ISIN
+  try{
+    const res=await fetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(raw)}&quotesCount=5&newsCount=0`,{headers:{"User-Agent":"Mozilla/5.0"}});
+    const data=await res.json();
+    const quotes=data?.quotes?.filter(q=>q.quoteType==="EQUITY"||q.quoteType==="ETF"||q.quoteType==="MUTUALFUND");
+    if(quotes&&quotes.length>0){
+      // Mostrar resultados para que el usuario elija
+      showSearchResults(quotes,raw);
+      return;
+    }
+  }catch(e){}
+
+  // Si no encuentra nada, añadir igualmente con precio 0
+  watchlist.push(v);
+  prices[v]=0;
+  histories[v]=genHist(10);
+  ASSETS[v]={name:v,risk:"medio",price:0,cur:"USD",sector:"Unknown",beta:1};
+  renderTab();
+}
+
+function showSearchResults(quotes,query){
+  const el=document.getElementById("tab-content");
+  const existing=el.innerHTML;
+  const overlay=document.createElement("div");
+  overlay.id="search-overlay";
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px";
+  overlay.innerHTML=`
+    <div style="background:#0e0c09;border:1px solid #3a3020;border-radius:12px;padding:20px;max-width:500px;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span style="color:#e2c97e;font-size:12px;font-weight:700">Resultados para "${query}"</span>
+        <button onclick="document.getElementById('search-overlay').remove()" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+      </div>
+      ${quotes.slice(0,5).map(q=>`
+        <div onclick="selectSearchResult('${q.symbol}','${(q.longname||q.shortname||q.symbol).replace(/'/g,"'")}','${q.quoteType||"Stock"}',${q.regularMarketPrice||0},'${q.currency||"USD"}')" style="background:#141210;border:1px solid #1c1a12;border-radius:8px;padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor='#a8945a55'" onmouseout="this.style.borderColor='#1c1a12'">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <span style="color:#f0e6c8;font-weight:700;font-size:13px">${q.symbol}</span>
+              <span style="color:var(--dim);font-size:10px;margin-left:8px">${q.quoteType||"Stock"} · ${q.exchange||""}</span>
+              <div style="color:#a09080;font-size:11px;margin-top:2px">${q.longname||q.shortname||""}</div>
+            </div>
+            ${q.regularMarketPrice?`<span style="color:#e2c97e;font-size:13px;font-weight:600">${q.currency==="EUR"?"€":"$"}${q.regularMarketPrice.toFixed(2)}</span>`:""}
+          </div>
+        </div>`).join("")}
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function selectSearchResult(symbol,name,type,price,currency){
+  document.getElementById("search-overlay")?.remove();
+  if(!watchlist.includes(symbol)){
+    watchlist.push(symbol);
+    prices[symbol]=price||10;
+    histories[symbol]=genHist(price||10);
+    ASSETS[symbol]={name:name,risk:"medio",price:price||10,cur:currency==="EUR"?"EUR":"USD",sector:type,beta:1};
+  }
+  renderTab();
+}
 function removeWL(t){watchlist=watchlist.filter(x=>x!==t);renderTab();}
 
 // ══ CARTERA ══════════════════════════════════════════════════
