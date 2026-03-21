@@ -57,7 +57,7 @@ button{cursor:pointer;font-family:inherit}
     <p style="color:var(--dim);font-size:9px;margin-top:2px;letter-spacing:.1em">LIVE · NOTICIAS · SEÑALES · MACRO · SIMULADOR SELFBANK</p>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <button class="btn" style="font-size:9px;padding:4px 9px" onclick="toggleKeyPanel()">✦ <span id="key-lbl">Activar IA</span></button>
+    <span style="background:#0a1f14;border:1px solid #22c55e44;color:#4ade80;font-size:9px;padding:4px 9px;border-radius:6px">✦ IA Activa</span>
     <div style="display:flex;align-items:center;gap:4px">
       <div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite"></div>
       <span id="clock" style="color:var(--dim);font-size:9px">LIVE</span>
@@ -66,14 +66,7 @@ button{cursor:pointer;font-family:inherit}
 </div>
 
 <!-- API KEY PANEL -->
-<div id="key-panel" style="display:none;background:#0e1018;border:1px solid #60a5fa33;border-radius:8px;padding:10px 12px;margin-bottom:12px">
-  <div style="color:var(--blue);font-size:10px;font-weight:700;margin-bottom:6px">API Key Anthropic — console.anthropic.com ($5 gratis al registrarte · ~2-5€/mes después)</div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <input type="password" id="api-key-inp" placeholder="sk-ant-xxxx..." style="flex:1;min-width:200px">
-    <button class="btn" onclick="saveKey()">Guardar</button>
-    <span style="color:var(--dim);font-size:10px">Activa los botones ✦ IA en toda la app</span>
-  </div>
-</div>
+
 
 <!-- ALERTA MACRO -->
 <div class="alert-bar">
@@ -212,8 +205,8 @@ function updateStats(){
 }
 
 // ══ API KEY ══════════════════════════════════════════════════
-function toggleKeyPanel(){const p=document.getElementById("key-panel");p.style.display=p.style.display==="none"?"block":"none";}
-function saveKey(){apiKey=document.getElementById("api-key-inp").value.trim();document.getElementById("key-lbl").textContent=apiKey?"IA Activa ✓":"Activar IA";document.getElementById("key-panel").style.display="none";}
+function toggleKeyPanel(){}
+function saveKey(){}
 
 // ══ ALERTS ══════════════════════════════════════════════════
 function checkAlerts(){
@@ -243,14 +236,10 @@ async function callAI(key,prompt,targetId){
   el.style.display="block";
   if(aiCache[key]){el.innerHTML=aiCache[key];return;}
   el.innerHTML=`<div style="display:flex;gap:8px;align-items:center;padding:8px 0"><div class="spinner"></div><span style="color:var(--dim);font-size:11px">Analizando...</span></div>`;
-  if(!apiKey){
-    const txt=`<h3>Sin API Key</h3><p>Para activar el análisis IA:</p><p>1. Ve a <strong>console.anthropic.com</strong></p><p>2. Regístrate — recibes <strong>$5 gratis</strong></p><p>3. Settings → API Keys → Create Key</p><p>4. Pulsa "Activar IA" arriba a la derecha y pega la clave</p>`;
-    el.innerHTML=txt;aiCache[key]=txt;return;
-  }
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,system:"Eres analista financiero experto en mercado español. Directo, preciso, sin clichés. En español. Usa ## para secciones y ** para negrita.",messages:[{role:"user",content:prompt}]})});
+    const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
     const d=await res.json();
-    const text=d.content?.map(b=>b.text||"").join("")||d.error?.message||"Sin respuesta.";
+    const text=d.text||d.error||"Sin respuesta.";
     const html=text.split("\n").map(l=>{
       if(l.startsWith("## "))return`<h3>${l.slice(3)}</h3>`;
       const h=l.replace(/\*\*(.*?)\*\*/g,(_,m)=>`<strong style="color:#f0e6c8">${m}</strong>`);
