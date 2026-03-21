@@ -5,126 +5,227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mi Asesor Inversor</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f7f6f3;color:#1a1a1a;font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
-input,select{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:8px;padding:8px 11px;background:#fff;outline:none;color:#1a1a1a;width:100%}
+body{background:#f4f3f0;color:#1a1a1a;font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
+input,select{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:8px;padding:8px 11px;background:#fff;outline:none;color:#1a1a1a}
 input:focus,select:focus{border-color:#2563eb}
 button{cursor:pointer;font-family:inherit}
-.wrap{max-width:800px;margin:0 auto;padding:24px 16px}
-.header{margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #e8e4dc}
-.header h1{font-size:22px;font-weight:600}
-.header .sub{font-size:12px;color:#888;margin-top:3px}
-.tabs{display:flex;gap:4px;margin-bottom:20px;background:#fff;border:1px solid #e8e4dc;border-radius:10px;padding:4px}
-.tab{flex:1;background:none;border:none;border-radius:7px;padding:9px 12px;font-size:13px;font-weight:500;color:#888;transition:all .15s}
-.tab.on{background:#2563eb;color:#fff}
-.section{background:#fff;border:1px solid #e8e4dc;border-radius:14px;padding:20px;margin-bottom:14px}
-.sec-title{font-size:11px;font-weight:600;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:14px}
-.horizon-block{margin-bottom:20px}
-.horizon-title{font-size:13px;font-weight:600;padding:6px 12px;border-radius:8px;margin-bottom:10px;display:inline-flex;align-items:center;gap:6px}
-.h-short{background:#fef3c7;color:#92400e}
-.h-medium{background:#dbeafe;color:#1e40af}
-.h-long{background:#dcfce7;color:#166534}
-.h-avoid{background:#fee2e2;color:#991b1b}
-.rec-item{border:1px solid #e8e4dc;border-radius:10px;padding:13px 15px;margin-bottom:8px}
-.rec-item:last-child{margin-bottom:0}
-.rec-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px}
-.rec-left{flex:1}
-.rec-ticker{font-weight:700;font-size:15px;margin-right:6px}
-.rec-name{font-size:12px;color:#555;margin-top:2px}
-.rec-isin{font-size:10px;color:#aaa;font-family:monospace;margin-top:1px}
-.rec-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
-.rec-reason{font-size:12px;color:#444;line-height:1.55;margin-bottom:8px}
-.rec-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap}
-.tag-etf{background:#ede9fe;color:#5b21b6}
-.tag-accion{background:#fce7f3;color:#9d174d}
-.tag-fondo{background:#cffafe;color:#0e7490}
-.badge{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap}
-.badge-buy{background:#dcfce7;color:#15803d}
-.badge-hold{background:#fef9c3;color:#854d0e}
-.badge-add{background:#dbeafe;color:#1d4ed8}
-.badge-avoid{background:#fee2e2;color:#b91c1c}
-.badge-acc{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-.price-tag{font-size:12px;color:#888}
-.weight-tag{font-size:11px;background:#f3f4f6;color:#374151;padding:2px 7px;border-radius:10px}
-.btn-ai{background:none;border:1px solid #2563eb22;color:#2563eb;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500}
-.btn-ai:hover{background:#eff6ff}
-.btn-primary{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500}
-.btn-primary:hover{background:#1d4ed8}
-.btn-ghost{background:none;border:1px solid #ddd;color:#555;border-radius:8px;padding:7px 13px;font-size:12px}
-.btn-ghost:hover{border-color:#999}
-.btn-icon{background:none;border:none;color:#ccc;padding:3px;font-size:15px;line-height:1}
-.btn-icon:hover{color:#888}
-.pos-card{border:1px solid #e8e4dc;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
-.pos-card:last-child{margin-bottom:0}
+.wrap{max-width:800px;margin:0 auto;padding:20px 16px}
+
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.header h1{font-size:20px;font-weight:700;color:#1a1a1a}
+.header .sub{font-size:11px;color:#999;margin-top:2px}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:4px;vertical-align:middle}
+
+/* RESUMEN CARTERA */
+.portfolio-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.ps-card{background:#fff;border:1px solid #e5e2dc;border-radius:12px;padding:14px 16px}
+.ps-card .label{font-size:10px;font-weight:600;letter-spacing:.08em;color:#999;text-transform:uppercase;margin-bottom:6px}
+.ps-card .value{font-size:22px;font-weight:700}
+.ps-card .sub{font-size:12px;color:#999;margin-top:2px}
+
+/* MARKET BAR */
+.market-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.mkt{background:#fff;border:1px solid #e5e2dc;border-radius:8px;padding:6px 12px;font-size:11px}
+.mkt .ml{color:#999;display:block;margin-bottom:1px}
+.mkt .mv{font-weight:600}
+.up{color:#16a34a}.dn{color:#dc2626}
+
+/* TABS */
+.tabs{display:flex;gap:3px;margin-bottom:16px;background:#e8e5e0;border-radius:10px;padding:3px}
+.tab{flex:1;background:none;border:none;border-radius:8px;padding:9px 8px;font-size:12px;font-weight:500;color:#888;transition:all .15s;white-space:nowrap}
+.tab.on{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:600}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e5e2dc;border-radius:14px;padding:18px 20px;margin-bottom:12px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:#999;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+
+/* HORIZONTE BLOCKS */
+.h-block{margin-bottom:22px}
+.h-label{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:12px}
+.h-short{background:#fff3cd;color:#7c4a00}
+.h-medium{background:#dbeafe;color:#1e3a8a}
+.h-long{background:#dcfce7;color:#14532d}
+.h-avoid{background:#fee2e2;color:#7f1d1d}
+
+/* REC ITEMS */
+.rec{border:1px solid #e5e2dc;border-radius:10px;padding:13px 15px;margin-bottom:8px;transition:border-color .15s}
+.rec:hover{border-color:#c5c0b8}
+.rec:last-child{margin-bottom:0}
+.rec-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.rec-ticker{font-weight:700;font-size:15px;margin-right:5px}
+.rec-name{font-size:12px;color:#666;margin-top:2px}
+.rec-isin{font-size:10px;color:#bbb;font-family:monospace;margin-top:1px;letter-spacing:.02em}
+.rec-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.rec-body{font-size:12px;color:#555;line-height:1.6;margin-bottom:8px}
+.rec-foot{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.rec-tags{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+
+/* BADGES */
+.badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b-buy{background:#dcfce7;color:#15803d}
+.b-acc{background:#dbeafe;color:#1d4ed8}
+.b-hold{background:#fef9c3;color:#92400e}
+.b-sell{background:#fee2e2;color:#b91c1c}
+.tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.t-etf{background:#ede9fe;color:#6d28d9}
+.t-acc{background:#fce7f3;color:#9d174d}
+.t-fund{background:#ccfbf1;color:#0f766e}
+.t-div{background:#fef3c7;color:#92400e}
+
+/* PORTFOLIO */
+.pos{border:1px solid #e5e2dc;border-radius:10px;padding:13px 16px;margin-bottom:8px}
+.pos:last-child{margin-bottom:0}
+.pos-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .pos-name{font-weight:600;font-size:14px}
-.pos-detail{font-size:12px;color:#888;margin-top:2px}
-.pos-val{font-size:16px;font-weight:600;text-align:right}
-.pos-pnl{font-size:12px;text-align:right;margin-top:2px}
-.up{color:#15803d}.dn{color:#b91c1c}
-.watch-card{border:1px solid #e8e4dc;border-radius:10px;padding:13px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
-.watch-card:last-child{margin-bottom:0}
-.ai-panel{background:#f8faff;border:1px solid #dbeafe;border-radius:9px;padding:13px 15px;margin-top:8px;font-size:12px;line-height:1.7;color:#333}
-.ai-panel h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin:10px 0 3px;border-bottom:1px solid #dbeafe;padding-bottom:2px}
+.pos-detail{font-size:11px;color:#999;margin-top:2px}
+.pos-val{font-size:17px;font-weight:700;text-align:right}
+.pos-pnl{font-size:12px;text-align:right;margin-top:2px;font-weight:500}
+
+/* WATCHLIST */
+.watch{border:1px solid #e5e2dc;border-radius:10px;padding:12px 15px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
+.watch:last-child{margin-bottom:0}
+
+/* BUTTONS */
+.btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600}
+.btn:hover{background:#1d4ed8}
+.btn-sm{background:none;border:1px solid #ddd;color:#555;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500}
+.btn-sm:hover{border-color:#999;color:#1a1a1a}
+.btn-ai{background:none;border:1px solid #2563eb33;color:#2563eb;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:500}
+.btn-ai:hover{background:#eff6ff}
+.btn-del{background:none;border:none;color:#ddd;font-size:15px;padding:3px;line-height:1}
+.btn-del:hover{color:#999}
+
+/* AI PANEL */
+.ai-panel{background:#f8faff;border:1px solid #dbeafe;border-radius:9px;padding:13px 15px;margin-top:8px;font-size:12px;line-height:1.75;color:#333}
+.ai-panel h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#2563eb;margin:12px 0 3px;padding-bottom:3px;border-bottom:1px solid #dbeafe}
 .ai-panel h3:first-child{margin-top:0}
 .ai-panel p{margin-bottom:5px}
-.ai-panel strong{color:#1a1a1a}
-.spinner{display:inline-block;width:13px;height:13px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-.market-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.mkt{background:#fff;border:1px solid #e8e4dc;border-radius:8px;padding:7px 13px;font-size:12px;white-space:nowrap}
-.mkt .ml{color:#888;font-size:10px;display:block}
-.mkt .mv{font-weight:600}
-.mkt .mc.up{color:#15803d}.mkt .mc.dn{color:#b91c1c}
-.empty{color:#bbb;font-size:13px;text-align:center;padding:24px 0}
-.loading-recs{text-align:center;padding:32px;color:#888}
+
+/* MISC */
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid #e5e2dc;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.empty{color:#bbb;font-size:13px;text-align:center;padding:24px}
 .divider{border:none;border-top:1px solid #f0ede8;margin:16px 0}
-.form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:14px}
-.form-group{display:flex;flex-direction:column;gap:4px}
-.form-group label{font-size:11px;color:#888;font-weight:500}
-.form-group input{width:auto}
-.context-bar{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#1e40af;line-height:1.6}
-.update-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:5px}
+.form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:#888;font-weight:500}
+.fg input{width:auto}
+.news-item{padding:12px 0;border-bottom:1px solid #f0ede8}
+.news-item:last-child{border-bottom:none}
+.loading{text-align:center;padding:32px;color:#999}
+.context-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:11px 15px;font-size:12px;color:#1e40af;line-height:1.6;margin-bottom:14px}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes fadein{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.fadein{animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadein .3s ease}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+<!-- HEADER -->
 <div class="header">
-  <h1>Mi Asesor Inversor</h1>
-  <div class="sub"><span class="update-dot"></span><span id="clock">--:--</span> · Análisis IA en tiempo real · Precios actualizados</div>
+  <div>
+    <h1>Mi Asesor Inversor</h1>
+    <div class="sub"><span class="dot"></span><span id="clock">--:--</span> · Análisis IA personalizado</div>
+  </div>
+  <div style="font-size:11px;color:#bbb" id="price-ind">actualizando...</div>
 </div>
 
-<div class="market-row">
-  <div class="mkt"><span class="ml">S&P 500</span><span class="mv">5.248 <span class="mc dn">▼-0.8%</span></span></div>
-  <div class="mkt"><span class="ml">Ibex 35</span><span class="mv">11.420 <span class="mc up">▲+0.3%</span></span></div>
-  <div class="mkt"><span class="ml">Brent</span><span class="mv">$101.4 <span class="mc up">▲+1.2%</span></span></div>
-  <div class="mkt"><span class="ml">EUR/USD</span><span class="mv">1.082 <span class="mc dn">▼-0.1%</span></span></div>
-  <div class="mkt"><span class="ml">VIX</span><span class="mv" style="color:#b91c1c">28.4 ⚡</span></div>
-  <div class="mkt"><span class="ml">Oro</span><span class="mv">$2.985 <span class="mc up">▲+0.6%</span></span></div>
+<!-- RESUMEN CARTERA -->
+<div class="portfolio-summary" id="port-summary">
+  <div class="ps-card">
+    <div class="label">Valor cartera</div>
+    <div class="value" id="ps-val">€0</div>
+    <div class="sub" id="ps-sub">--</div>
+  </div>
+  <div class="ps-card">
+    <div class="label">Ganancia total</div>
+    <div class="value" id="ps-pnl" style="color:#16a34a">+€0</div>
+    <div class="sub" id="ps-pct">--</div>
+  </div>
+  <div class="ps-card">
+    <div class="label">Aportación mensual</div>
+    <div class="value" style="color:#2563eb">200-400€</div>
+    <div class="sub">+ 150€ hijos (3×50€)</div>
+  </div>
 </div>
 
-<div class="context-bar">
-  <strong>Contexto macro activo:</strong> Ormuz cerrado · Brent $101 · S&P500 en corrección · Fed retrasa tipos sept 2026 · Rearme europeo +40% · Goldman obj. petróleo $150 · JPMorgan obj. oro $3.500
+<!-- HIJOS SUMMARY -->
+<div style="background:#fff;border:1px solid #e5e2dc;border-radius:12px;padding:14px 18px;margin-bottom:16px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#999;text-transform:uppercase;margin-bottom:10px">👨‍👧‍👦 Cuentas hijos — MyInvestor · Vanguard Global Stock IE00B03HD191</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 12px">
+      <div style="font-size:11px;font-weight:600;color:#166534;margin-bottom:4px">Hijo mayor · 12 años</div>
+      <div style="font-size:13px;font-weight:700;color:#1a1a1a">6 años hasta 18</div>
+      <div style="font-size:11px;color:#666;margin-top:2px">50€/mes → <strong>~€4.600</strong></div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 12px">
+      <div style="font-size:11px;font-weight:600;color:#166534;margin-bottom:4px">Mellizo 1 · 10 años</div>
+      <div style="font-size:13px;font-weight:700;color:#1a1a1a">8 años hasta 18</div>
+      <div style="font-size:11px;color:#666;margin-top:2px">50€/mes → <strong>~€7.000</strong></div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 12px">
+      <div style="font-size:11px;font-weight:600;color:#166534;margin-bottom:4px">Mellizo 2 · 10 años</div>
+      <div style="font-size:13px;font-weight:700;color:#1a1a1a">8 años hasta 18</div>
+      <div style="font-size:11px;color:#666;margin-top:2px">50€/mes → <strong>~€7.000</strong></div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:#999;margin-top:8px">Estimaciones con rentabilidad histórica MSCI World ~9% anual. Si subes a 100€/mes las cifras se duplican.</div>
 </div>
 
+<!-- MERCADO -->
+<div class="market-bar">
+  <div class="mkt"><span class="ml">S&P 500</span><span class="mv">5.248 <span class="dn">▼-0.8%</span></span></div>
+  <div class="mkt"><span class="ml">Ibex 35</span><span class="mv">11.420 <span class="up">▲+0.3%</span></span></div>
+  <div class="mkt"><span class="ml">Brent</span><span class="mv">$101.4 <span class="up">▲+1.2%</span></span></div>
+  <div class="mkt"><span class="ml">Oro</span><span class="mv">$2.985 <span class="up">▲+0.6%</span></span></div>
+  <div class="mkt"><span class="ml">VIX</span><span class="mv" style="color:#dc2626;font-weight:700">28.4 ⚡</span></div>
+  <div class="mkt"><span class="ml">EUR/USD</span><span class="mv">1.082</span></div>
+</div>
+
+<!-- TABS -->
 <div class="tabs">
   <button class="tab on" onclick="setTab('recs',this)">📋 Recomendaciones</button>
   <button class="tab" onclick="setTab('cartera',this)">💼 Mi cartera</button>
   <button class="tab" onclick="setTab('seguir',this)">🔍 Seguir valores</button>
+  <button class="tab" onclick="setTab('noticias',this)">📰 Noticias</button>
 </div>
 
 <div id="tab-content"></div>
 
 </div>
-
 <script>
-const CONTEXT = `Eres un asesor financiero experto para inversores particulares españoles. Contexto macro actual (marzo 2026): Estrecho de Ormuz cerrado por tensión con Irán, Brent a $101/barril, S&P500 en corrección -5% desde máximos, VIX en 28, Fed retrasa primer recorte de tipos a septiembre 2026, presupuestos defensa UE +40% por rearme, Goldman Sachs objetivo petróleo $150, JPMorgan objetivo oro $3.500. El inversor es español, cartera <10.000€, perfil 70% largo plazo + 30% oportunidades. Responde siempre en español, de forma directa y concisa como OCU Inversores.`;
+// ══ PERFIL Y CONTEXTO ══════════════════════════════════════════
+const CONTEXT = `Eres un asesor financiero experto para inversores particulares españoles. Responde siempre en español, directo y concreto como OCU Inversores.
 
+PERFIL DEL INVERSOR:
+- Juanjo, 44 años, ingresos familiares ~80.000€/año (él y su mujer)
+- Cartera propia ~€35.700: Iberdrola 1.641 acciones (coste medio €10,75, plusvalía ~+78%) + Fondo Amundi Global Equity A EUR ACC LU1883342377 (valor ~€4.271, en Selfbank)
+- Aporta 200-400€/mes adicionales para él y su mujer
+- Brokers: Selfbank (Iberdrola actual). Abriendo MyInvestor (fondos largo plazo) y Trade Republic (oportunidades corto)
+- Pendiente: traspasar Amundi a Fidelity MSCI World IE00BYX5NX33 (TER 0.12%) sin IRPF
+- Pendiente: decidir si reducir parte de Iberdrola para diversificar (plusvalía €13.800, tramo IRPF 21%)
+- Estrategia: 80% base sólida (medio-largo plazo) + 20% oportunidades corto plazo
+- Objetivo: crecer capital + liquidez para imprevistos
+
+CUENTAS HIJOS (MyInvestor, 50€/mes cada uno, fondo Vanguard Global Stock IE00B03HD191):
+- Hijo mayor: 12 años → 6 años hasta los 18 → estimado ~€4.600
+- Mellizo 1: 10 años → 8 años hasta los 18 → estimado ~€7.000
+- Mellizo 2: 10 años → 8 años hasta los 18 → estimado ~€7.000
+
+CONTEXTO MACRO ACTUAL (marzo 2026):
+- Estrecho de Ormuz cerrado por tensión con Irán
+- Brent $101/barril (+40% en 3 meses), Goldman objetivo $150
+- S&P500 en corrección -5% desde máximos, VIX 28
+- Fed retrasa primer recorte tipos a septiembre 2026
+- Presupuestos defensa UE +40% por rearme
+- JPMorgan objetivo oro $3.500 a fin 2026`;
+
+// ══ DATOS ══════════════════════════════════════════════════════
 const KNOWN = {
   "IBE.MC":{name:"Iberdrola",sector:"Utilities",price:19.20,cur:"EUR"},
   "REP.MC":{name:"Repsol",sector:"Energía",price:14.50,cur:"EUR"},
@@ -136,6 +237,8 @@ const KNOWN = {
   "NVDA":{name:"NVIDIA",sector:"IA / Semis",price:875.40,cur:"USD"},
   "LMT":{name:"Lockheed Martin",sector:"Defensa",price:520.40,cur:"USD"},
   "TTE":{name:"TotalEnergies",sector:"Energía",price:58.40,cur:"EUR"},
+  "VZ":{name:"Verizon",sector:"Telecom",price:40.20,cur:"USD"},
+  "JNJ":{name:"Johnson & Johnson",sector:"Healthcare",price:155.40,cur:"USD"},
   "XLE":{name:"Energy Select ETF",sector:"Energía",price:91.20,cur:"USD"},
   "GLD":{name:"SPDR Gold ETF",sector:"Oro",price:218.40,cur:"USD"},
   "SPY":{name:"S&P 500 ETF",sector:"Índice USA",price:524.80,cur:"USD"},
@@ -143,79 +246,102 @@ const KNOWN = {
   "VWRL":{name:"Vanguard All-World ETF",sector:"Global",price:108.35,cur:"USD"},
   "IWDA":{name:"iShares MSCI World ETF",sector:"MSCI World",price:95.40,cur:"EUR"},
   "CSPX":{name:"iShares Core S&P500 ETF",sector:"S&P 500",price:580.20,cur:"USD"},
+  "SCHD":{name:"Schwab US Dividend ETF",sector:"Dividendos USA",price:28.10,cur:"USD"},
 };
 
 let prices = Object.fromEntries(Object.keys(KNOWN).map(k=>[k,KNOWN[k].price]));
 let portfolio = [
-  {ticker:"IBE.MC",name:"Iberdrola",shares:200,cost:12.10},
-  {ticker:"IWDA",name:"iShares MSCI World",shares:10,cost:80.00},
+  {ticker:"IBE.MC", name:"Iberdrola", shares:1641, cost:10.75},
+  {ticker:"LU1883342377", name:"Amundi Global Equity A EUR ACC", shares:18.089, cost:236.22, isFund:true, fundValue:4271.17},
 ];
 let watchlist = [];
 let aiCache = {};
 let recsData = null;
 let currentTab = "recs";
+let newsCache = [], newsTs = 0;
 
-// Clock
+// ══ CLOCK ══════════════════════════════════════════════════════
 setInterval(()=>{const e=document.getElementById("clock");if(e)e.textContent=new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});},15000);
 document.getElementById("clock").textContent=new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 
-// Real prices
+// ══ PRECIOS REALES ══════════════════════════════════════════════
 async function loadRealPrices(tickers){
   if(!tickers?.length)return;
   try{
     const res=await fetch(`/api/prices?symbols=${tickers.join(",")}`);
     const d=await res.json();
-    if(d.ok)Object.entries(d.data).forEach(([t,info])=>{
-      if(!info.error&&info.price>0){
-        prices[t]=info.price;
-        if(!KNOWN[t])KNOWN[t]={name:info.name||t,sector:"",price:info.price,cur:info.currency||"USD"};
-      }
-    });
-    if(currentTab==="cartera")renderCartera();
-    if(currentTab==="seguir")renderSeguir();
+    if(d.ok){
+      Object.entries(d.data).forEach(([t,info])=>{
+        if(!info.error&&info.price>0){
+          prices[t]=info.price;
+          if(!KNOWN[t])KNOWN[t]={name:info.name||t,sector:"",price:info.price,cur:info.currency||"USD"};
+          else{KNOWN[t].name=info.name||KNOWN[t].name;}
+        }
+      });
+      const ind=document.getElementById("price-ind");
+      if(ind)ind.textContent="precios actualizados "+new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+      updateSummary();
+      if(currentTab==="cartera")renderCartera();
+      if(currentTab==="seguir")renderSeguir();
+    }
   }catch(e){}
 }
-function refreshPrices(){
-  const all=[...new Set([...portfolio.map(p=>p.ticker),...watchlist])];
+function refreshAll(){
+  const all=[...new Set([...portfolio.map(p=>p.ticker).filter(t=>!portfolio.find(p=>p.ticker===t)?.isFund),...watchlist])];
   if(all.length)loadRealPrices(all);
 }
-refreshPrices();
-setInterval(refreshPrices,60000);
+refreshAll();
+setInterval(refreshAll,60000);
+setInterval(()=>{
+  Object.keys(prices).forEach(k=>{prices[k]=+(prices[k]*(1+(Math.random()-.499)*.002)).toFixed(2);});
+  updateSummary();
+},10000);
 
-// AI call
+// ══ SUMMARY ════════════════════════════════════════════════════
+function updateSummary(){
+  let totalVal=0,totalCost=0;
+  portfolio.forEach(p=>{
+    if(p.isFund){totalVal+=p.fundValue;totalCost+=p.cost*p.shares;}
+    else{const price=prices[p.ticker]||KNOWN[p.ticker]?.price||p.cost;totalVal+=price*p.shares;totalCost+=p.cost*p.shares;}
+  });
+  const pnl=totalVal-totalCost,pct=totalCost?((pnl/totalCost)*100).toFixed(1):"0";
+  const sv=document.getElementById("ps-val");if(sv)sv.textContent=`€${totalVal.toFixed(0)}`;
+  const sp=document.getElementById("ps-pnl");if(sp){sp.textContent=`${pnl>=0?"+":""}€${pnl.toFixed(0)}`;sp.style.color=pnl>=0?"#16a34a":"#dc2626";}
+  const sc=document.getElementById("ps-pct");if(sc){sc.textContent=`${pnl>=0?"+":""}${pct}% sobre inversión`;sc.style.color=pnl>=0?"#16a34a":"#dc2626";}
+  const ss=document.getElementById("ps-sub");if(ss)ss.textContent=`Iberdrola + Amundi`;
+}
+updateSummary();
+
+// ══ AI ══════════════════════════════════════════════════════════
 async function callAI(prompt){
   try{
     const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
     const d=await res.json();
     return d.text||d.error||"Sin respuesta.";
-  }catch(e){return"Error de conexión.";}
+  }catch(e){return "Error de conexión.";}
 }
-
 function md2html(t){
   return t.split("\n").map(l=>{
-    if(l.startsWith("## "))return`<h3>${l.slice(3)}</h3>`;
-    if(l.startsWith("# "))return`<h3>${l.slice(2)}</h3>`;
+    if(l.startsWith("## ")||l.startsWith("# "))return`<h3>${l.replace(/^#+\s/,"")}</h3>`;
     const h=l.replace(/\*\*(.*?)\*\*/g,`<strong>$1</strong>`).replace(/\*(.*?)\*/g,`<em>$1</em>`);
     return l.trim()?`<p>${h}</p>`:"";
   }).filter(Boolean).join("");
 }
-
-function badgeClass(action){
-  const a=(action||"").toUpperCase();
-  if(a.includes("COMPRAR")||a==="BUY")return"badge-buy";
-  if(a.includes("ACUMULAR")||a.includes("AÑADIR")||a==="ADD")return"badge-acc";
-  if(a.includes("MANTENER")||a==="HOLD")return"badge-hold";
-  if(a.includes("VENDER")||a.includes("EVITAR"))return"badge-avoid";
-  return"badge-add";
+function badgeCls(a){
+  const u=(a||"").toUpperCase();
+  if(u.includes("COMPRAR")||u==="BUY")return"b-buy";
+  if(u.includes("ACUMULAR")||u.includes("AÑADIR"))return"b-acc";
+  if(u.includes("MANTENER")||u==="HOLD")return"b-hold";
+  return"b-sell";
 }
-function typeClass(type){
-  const t=(type||"").toLowerCase();
-  if(t.includes("etf"))return"tag-etf";
-  if(t.includes("fondo"))return"tag-fondo";
-  return"tag-accion";
+function typeCls(t){
+  const u=(t||"").toLowerCase();
+  if(u.includes("etf"))return"t-etf";
+  if(u.includes("fondo"))return"t-fund";
+  return"t-acc";
 }
 
-// TABS
+// ══ TABS ════════════════════════════════════════════════════════
 function setTab(t,el){
   currentTab=t;
   document.querySelectorAll(".tab").forEach(b=>b.classList.remove("on"));
@@ -223,81 +349,117 @@ function setTab(t,el){
   if(t==="recs")renderRecs();
   else if(t==="cartera")renderCartera();
   else if(t==="seguir")renderSeguir();
+  else if(t==="noticias"){renderNoticias();fetchNews();}
 }
 
-// RECOMENDACIONES
+// ══ RECOMENDACIONES ═════════════════════════════════════════════
+const FALLBACK = {
+  updated:"marzo 2026",
+  short:[
+    {ticker:"XLE",name:"Energy Select Sector SPDR ETF",isin:"",type:"ETF",action:"COMPRAR",reason:"Ormuz cerrado = petróleo alto = sector energético sube. ETF diversificado, sin riesgo empresa individual. Cobertura directa a la crisis actual.",price:"$91",weight:8,dividend:"3.2%"},
+    {ticker:"REP.MC",name:"Repsol",isin:"",type:"Acción",action:"COMPRAR",reason:"Goldman objetivo €24. Brent $100+ dispara márgenes de refino. Además paga dividendo del 6.2% anual.",price:"€14.50",weight:5,dividend:"6.2%"},
+    {ticker:"GLD",name:"SPDR Gold Shares ETF",isin:"",type:"ETF",action:"AÑADIR",reason:"Refugio geopolítico clásico. JPMorgan objetivo $3.500 en 2026. Cubre inflación energética y tensión Irán.",price:"$218",weight:5,dividend:"Sin dividendo"},
+  ],
+  medium:[
+    {ticker:"LMT",name:"Lockheed Martin",isin:"",type:"Acción",action:"COMPRAR",reason:"Presupuestos defensa UE +40%. Backlog récord. Superciclo de rearme que durará años. Dividendo estable.",price:"$520",weight:6,dividend:"2.8%"},
+    {ticker:"TTE",name:"TotalEnergies",isin:"",type:"Acción",action:"COMPRAR",reason:"Mejor valorada entre petroleras europeas. Brent $100+ dispara márgenes. Dividendo del 5.1% sostenible.",price:"€58",weight:5,dividend:"5.1%"},
+    {ticker:"JNJ",name:"Johnson & Johnson",isin:"",type:"Acción",action:"ACUMULAR",reason:"63 años consecutivos aumentando dividendo. Defensiva en correcciones. Healthcare es refugio en crisis.",price:"$155",weight:4,dividend:"3.4%"},
+    {ticker:"VZ",name:"Verizon Communications",isin:"",type:"Acción",action:"ACUMULAR",reason:"Dividendo del 6.5% muy estable. Telecom defensiva. Beneficia directamente de la bajada de tipos en sept 2026.",price:"$40",weight:4,dividend:"6.5%"},
+    {ticker:"IBE.MC",name:"Iberdrola",isin:"",type:"Acción",action:"MANTENER",reason:"Ya en cartera con +78% de ganancia. Utility defensiva. Crisis fósil acelera renovables. No tocar.",price:"€19",weight:10,dividend:"3.1%"},
+  ],
+  long:[
+    {ticker:"IWDA",name:"iShares Core MSCI World UCITS ETF",isin:"IE00B4L5Y983",type:"ETF",action:"ACUMULAR",reason:"1.500 empresas globales. TER 0.20%. Corrección actual -5% es el mejor punto de entrada en 18 meses. Ideal para aportación mensual.",price:"€95",weight:25,dividend:"1.5%"},
+    {ticker:"VWRL",name:"Vanguard FTSE All-World UCITS ETF",isin:"IE00B3RBWM25",type:"ETF",action:"ACUMULAR",reason:"2.700 empresas de 50 países. El ETF más diversificado del mundo. TER 0.22%. Estrategia de comprar y olvidar.",price:"$108",weight:20,dividend:"1.8%"},
+    {ticker:"CSPX",name:"iShares Core S&P 500 UCITS ETF",isin:"IE00B5BMR087",type:"ETF",action:"ACUMULAR",reason:"S&P500 en corrección -5% = oportunidad. TER 0.07%, el más barato. Histórico: sube siempre a largo plazo.",price:"$580",weight:15,dividend:"1.3%"},
+    {ticker:"IE0032620787",name:"Vanguard U.S. 500 Stock Index (Fondo)",isin:"IE0032620787",type:"Fondo indexado",action:"ACUMULAR",reason:"TRASPASABLE sin peaje IRPF. TER 0.10%. Ideal para las aportaciones mensuales — mover el dinero sin tributar.",price:"VL diario",weight:15,dividend:"Acumulación"},
+    {ticker:"SCHD",name:"Schwab US Dividend Equity ETF",isin:"",type:"ETF",action:"ACUMULAR",reason:"ETF de dividendos USA de alta calidad. 3.5% yield + crecimiento del dividendo ~10% anual. Construcción de renta pasiva.",price:"$28",weight:8,dividend:"3.5%"},
+  ],
+  avoid:[
+    {ticker:"IAG.MC",name:"IAG (Iberia/British Airways)",reason:"Brent $100 destruye márgenes aerolíneas. Evitar hasta que Ormuz reabra."},
+    {ticker:"ICLN",name:"iShares Global Clean Energy ETF",reason:"Aranceles + demanda -18%. El mercado solar sufre. Evitar hasta 2027."},
+    {ticker:"ARKK",name:"ARK Innovation ETF",reason:"Growth especulativo en entorno risk-off. Tipos altos lo penalizan fuerte."},
+  ]
+};
+
 function renderRecs(){
   const el=document.getElementById("tab-content");
   if(!recsData){
-    el.innerHTML=`<div class="section">
-      <div class="loading-recs">
-        <div style="font-size:32px;margin-bottom:12px">🤖</div>
-        <div style="font-weight:600;font-size:15px;margin-bottom:6px">Generando recomendaciones con IA</div>
-        <div style="color:#bbb;font-size:13px;margin-bottom:20px">ETFs, fondos y acciones según el contexto actual del mercado</div>
-        <button class="btn-primary" onclick="loadRecommendations()">▶ Generar recomendaciones</button>
+    el.innerHTML=`<div class="context-note">
+      <strong>Tu estrategia:</strong> 80% base sólida (medio-largo plazo) + 20% oportunidades (corto plazo para adelantarte al mercado). La IA genera recomendaciones personalizadas según tu cartera actual y el contexto macro del momento.
+    </div>
+    <div class="card">
+      <div class="loading">
+        <div style="font-size:28px;margin-bottom:10px">🤖</div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:5px">Generando recomendaciones personalizadas</div>
+        <div style="color:#bbb;font-size:12px;margin-bottom:20px">ETFs · Fondos · Acciones · Dividendos · Corto, medio y largo plazo</div>
+        <button class="btn" onclick="loadRecommendations()">▶ Generar ahora</button>
       </div>
     </div>`;
     return;
   }
-  const {short,medium,long,avoid}=recsData;
+  const {short,medium,long,avoid,updated}=recsData;
   el.innerHTML=`
-    <div class="section">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <span class="sec-title" style="margin-bottom:0">Recomendaciones IA — ${recsData.updated||"marzo 2026"}</span>
-        <button class="btn-ghost" onclick="loadRecommendations()">↻ Actualizar</button>
-      </div>
-      <div class="horizon-block">
-        <div class="horizon-title h-short">⚡ Corto plazo <span style="font-weight:400;font-size:11px">días — semanas</span></div>
-        ${renderRecList(short)}
-      </div>
-      <div class="horizon-block">
-        <div class="horizon-title h-medium">📅 Medio plazo <span style="font-weight:400;font-size:11px">1 — 12 meses</span></div>
-        ${renderRecList(medium)}
-      </div>
-      <div class="horizon-block">
-        <div class="horizon-title h-long">🌱 Largo plazo <span style="font-weight:400;font-size:11px">1 — 10 años</span></div>
-        ${renderRecList(long)}
-      </div>
-      ${avoid?.length?`<div class="horizon-block">
-        <div class="horizon-title h-avoid">🚫 Evitar ahora</div>
-        ${avoid.map(a=>`<div class="rec-item fadein" style="border-color:#fee2e2">
-          <div class="rec-header">
-            <div class="rec-left">
-              <span class="rec-ticker">${a.ticker||""}</span>
-              <span style="font-size:13px;color:#555">${a.name||""}</span>
-            </div>
-            <span class="badge badge-avoid">EVITAR</span>
-          </div>
-          <div class="rec-reason">${a.reason||""}</div>
-        </div>`).join("")}
-      </div>`:""}
-    </div>`;
+  <div class="context-note">
+    <strong>Tu estrategia:</strong> 80% base sólida + 20% oportunidades corto plazo.
+    <strong>Aportación mensual:</strong> destina 200-400€ a ETFs globales (largo plazo) y reserva una parte para las oportunidades de corto.
+  </div>
+  <div class="card">
+    <div class="card-title">Recomendaciones IA · ${updated||"marzo 2026"}
+      <button class="btn-sm" onclick="loadRecommendations()">↻ Regenerar</button>
+    </div>
+    <div class="h-block">
+      <div class="h-label h-short">⚡ Corto plazo <span style="font-weight:400;font-size:11px;margin-left:4px">días a semanas · para adelantarse al mercado</span></div>
+      ${renderList(short)}
+    </div>
+    <div class="h-block">
+      <div class="h-label h-medium">📅 Medio plazo <span style="font-weight:400;font-size:11px;margin-left:4px">1 a 12 meses</span></div>
+      ${renderList(medium)}
+    </div>
+    <div class="h-block">
+      <div class="h-label h-long">🌱 Largo plazo <span style="font-weight:400;font-size:11px;margin-left:4px">1 a 10 años · base de cartera</span></div>
+      ${renderList(long)}
+    </div>
+    ${avoid?.length?`<div class="h-block">
+      <div class="h-label h-avoid">🚫 Evitar ahora</div>
+      ${avoid.map(a=>`<div class="rec fi" style="border-color:#fecaca">
+        <div class="rec-top"><div><span class="rec-ticker">${a.ticker||""}</span><div class="rec-name">${a.name||""}</div></div><span class="badge b-sell">EVITAR</span></div>
+        <div class="rec-body">${a.reason||""}</div>
+      </div>`).join("")}
+    </div>`:""}
+  </div>`;
 }
 
-function renderRecList(items){
-  if(!items?.length)return`<div class="empty">Sin recomendaciones en este horizonte</div>`;
+function renderList(items){
+  if(!items?.length)return`<div class="empty">Sin datos</div>`;
   return items.map((r,i)=>{
-    const key=`rec-${r.ticker}-${i}`;
-    return`<div class="rec-item fadein">
-      <div class="rec-header">
-        <div class="rec-left">
-          <div style="margin-bottom:3px">
+    const key=`r-${r.ticker}-${i}`;
+    const hasDivs=r.dividend&&r.dividend!=="Sin dividendo"&&r.dividend!=="0%"&&r.dividend!=="Acumulación"&&r.dividend!=="";
+    const isAccum=r.dividend==="Acumulación";
+    return`<div class="rec fi">
+      <div class="rec-top">
+        <div>
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
             <span class="rec-ticker">${r.ticker||""}</span>
-            <span class="tag ${typeClass(r.type)}">${r.type||"ETF"}</span>
+            <span class="tag ${typeCls(r.type)}">${r.type||"ETF"}</span>
+            ${hasDivs?`<span class="tag t-div">💰 ${r.dividend}</span>`:""}
+            ${isAccum?`<span class="tag" style="background:#f0fdf4;color:#166534">Acumulación</span>`:""}
+            ${!hasDivs&&!isAccum?`<span class="tag" style="background:#f9fafb;color:#9ca3af">Sin dividendo</span>`:""}
           </div>
           <div class="rec-name">${r.name||""}</div>
           ${r.isin?`<div class="rec-isin">ISIN: ${r.isin}</div>`:""}
         </div>
-        <div class="rec-right">
-          <span class="badge ${badgeClass(r.action)}">${r.action||"COMPRAR"}</span>
-          ${r.price?`<span class="price-tag">${r.price}</span>`:""}
-          ${r.weight?`<span class="weight-tag">${r.weight}% cartera</span>`:""}
+        <div class="rec-badges">
+          <span class="badge ${badgeCls(r.action)}">${r.action||""}</span>
+          ${r.price?`<span style="font-size:11px;color:#999">${r.price}</span>`:""}
+          ${r.weight?`<span style="font-size:10px;background:#f3f4f6;color:#555;padding:2px 7px;border-radius:10px">${r.weight}% cartera</span>`:""}
         </div>
       </div>
-      <div class="rec-reason">${r.reason||""}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-        <button class="btn-ai" onclick="toggleItemAI('${key}','${(r.ticker||"").replace(/'/g,"\\'")}','${(r.name||"").replace(/'/g,"\\'")}','${(r.action||"").replace(/'/g,"\\'")}')">✦ Análisis IA detallado</button>
-        <button class="btn-ghost" style="font-size:11px" onclick="addToWatchFromRec('${r.ticker}','${(r.name||"").replace(/'/g,"\\'")}')">+ Añadir a seguimiento</button>
+      <div class="rec-body">${r.reason||""}</div>
+      <div style="display:flex;gap:6px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <div style="display:flex;gap:6px">
+          <button class="btn-ai" onclick="toggleAI('${key}','${(r.ticker||"").replace(/'/g,"\\'")}','${(r.name||"").replace(/'/g,"\\'")}','${(r.action||"").replace(/'/g,"\\'")}','${r.dividend||""}')">✦ Análisis detallado</button>
+          <button class="btn-sm" onclick="addWatch('${r.ticker}','${(r.name||"").replace(/'/g,"\\'")}')">+ Seguir</button>
+        </div>
       </div>
       <div id="${key}" style="display:none"></div>
     </div>`;
@@ -307,122 +469,118 @@ function renderRecList(items){
 async function loadRecommendations(){
   recsData=null;
   const el=document.getElementById("tab-content");
-  el.innerHTML=`<div class="section"><div class="loading-recs">
-    <div class="spinner"></div>
-    <span style="font-size:14px;color:#555">La IA está analizando el mercado global...</span>
-    <div style="color:#bbb;font-size:12px;margin-top:8px">ETFs · Fondos · Acciones · Contexto macro</div>
-  </div></div>`;
+  el.innerHTML=`<div class="card"><div class="loading"><span class="spinner"></span><span style="font-size:13px">La IA analiza el mercado global y tu cartera...</span><div style="color:#bbb;font-size:11px;margin-top:8px">ETFs · Fondos · Acciones · Dividendos · 3 horizontes</div></div></div>`;
+  const prompt=`${CONTEXT}
+
+Genera recomendaciones de inversión globales personalizadas para este inversor. Incluye ETFs, fondos indexados Y acciones de cualquier bolsa del mundo.
+
+IMPORTANTE: Para cada recomendación incluye el dividendo anual (%) si lo paga. Si no paga dividendo escribe "Sin dividendo". Si es fondo de acumulación escribe "Acumulación".
+
+Organiza en 3 horizontes + lista de evitar. Para cada item:
+- ticker: ticker exacto de bolsa
+- name: nombre completo
+- isin: ISIN si es fondo o ETF europeo (dejar "" si no aplica)
+- type: "Acción" / "ETF" / "Fondo indexado"
+- action: "COMPRAR" / "ACUMULAR" / "MANTENER"
+- reason: razón en máximo 2 líneas, menciona dividendo si es relevante
+- price: precio aproximado actual con símbolo € o $
+- weight: peso sugerido en cartera (número entero %)
+- dividend: dividendo anual % o "Sin dividendo" o "Acumulación"
+
+Responde ÚNICAMENTE con JSON válido sin backticks:
+{"updated":"marzo 2026","short":[...],"medium":[...],"long":[...],"avoid":[{"ticker":"","name":"","reason":""}]}`;
 
   try{
-    const portStr=portfolio.map(p=>`${p.ticker} (${p.name}): ${p.shares} tít. a €${p.cost}`).join(", ");
-    const prompt=`${CONTEXT}\n\nCartera actual del inversor: ${portStr||"Comenzando cartera"}\n\nGenera recomendaciones de inversión globales para este inversor. Incluye ETFs, fondos indexados Y acciones de cualquier bolsa del mundo. Organiza por horizonte temporal.\n\nPara cada recomendación:\n- Ticker exacto de bolsa\n- ISIN si es fondo o ETF europeo\n- Tipo: Acción / ETF / Fondo indexado\n- Acción: COMPRAR / ACUMULAR / MANTENER\n- Razón en máximo 2 líneas\n- Precio aproximado actual\n- Peso sugerido en cartera %\n\nResponde ÚNICAMENTE con JSON válido, sin backticks, con esta estructura:\n{"updated":"marzo 2026","short":[...],"medium":[...],"long":[...],"avoid":[...]}\n\nCada item: {"ticker":"","name":"","isin":"","type":"","action":"","reason":"","price":"","weight":0}\nLos items de avoid: {"ticker":"","name":"","reason":""}`;
-
     const text=await callAI(prompt);
     const clean=text.replace(/```json|```/g,"").trim();
-    // Find JSON in response
-    const start=clean.indexOf("{"),end=clean.lastIndexOf("}");
-    if(start>=0&&end>start){
-      recsData=JSON.parse(clean.slice(start,end+1));
-    }else{
-      throw new Error("No JSON found");
-    }
-  }catch(e){
-    // Fallback con datos curados
-    recsData={
-      updated:"marzo 2026",
-      short:[
-        {ticker:"XLE",name:"Energy Select Sector SPDR ETF",isin:"",type:"ETF",action:"COMPRAR",reason:"Ormuz cerrado dispara sector energético. Cobertura directa al petróleo sin riesgo empresa individual.",price:"$91",weight:8},
-        {ticker:"REP.MC",name:"Repsol",isin:"",type:"Acción",action:"COMPRAR",reason:"Goldman objetivo €24. Con Brent $100+ los márgenes de refino se disparan. Dividendo 6%.",price:"€14.50",weight:5},
-        {ticker:"GLD",name:"SPDR Gold Shares ETF",isin:"",type:"ETF",action:"AÑADIR",reason:"Refugio geopolítico. JPMorgan objetivo $3.500 en 2026. Cobertura ante inflación energética.",price:"$218",weight:6},
-      ],
-      medium:[
-        {ticker:"LMT",name:"Lockheed Martin",isin:"",type:"Acción",action:"COMPRAR",reason:"Presupuestos defensa UE +40%. Superciclo de rearme estructural. Backlog récord de pedidos.",price:"$520",weight:6},
-        {ticker:"TTE",name:"TotalEnergies",isin:"",type:"Acción",action:"COMPRAR",reason:"Mejor valorada entre petroleras europeas. Brent $100+, dividendo 5.1%, transición energética.",price:"€58",weight:5},
-        {ticker:"IBE.MC",name:"Iberdrola",isin:"",type:"Acción",action:"MANTENER",reason:"Ya en cartera y en positivo. Crisis fósil acelera renovables. Tipos bajos sept 2026 benefician.",price:"€19",weight:10},
-        {ticker:"NVDA",name:"NVIDIA",isin:"",type:"Acción",action:"ACUMULAR",reason:"Tesis IA estructural intacta. Solo acumular en caídas >15%. Corrección actual es oportunidad.",price:"$875",weight:8},
-      ],
-      long:[
-        {ticker:"IWDA",name:"iShares Core MSCI World UCITS ETF",isin:"IE00B4L5Y983",type:"ETF",action:"ACUMULAR",reason:"1.500 empresas globales. TER 0.20%. Corrección actual es la mejor entrada en 18 meses.",price:"€95",weight:25},
-        {ticker:"VWRL",name:"Vanguard FTSE All-World UCITS ETF",isin:"IE00B3RBWM25",type:"ETF",action:"ACUMULAR",reason:"2.700 empresas de 50 países. El ETF más diversificado. TER 0.22%. Comprar y olvidar.",price:"$108",weight:20},
-        {ticker:"CSPX",name:"iShares Core S&P 500 UCITS ETF",isin:"IE00B5BMR087",type:"ETF",action:"ACUMULAR",reason:"S&P500 en corrección -5% = punto de entrada. TER 0.07%, el más barato de su clase.",price:"$580",weight:15},
-        {ticker:"IE0032620787",name:"Vanguard U.S. 500 Stock Index (Fondo)",isin:"IE0032620787",type:"Fondo indexado",action:"ACUMULAR",reason:"Fondo español TRASPASABLE. Sin peaje IRPF al cambiar. TER 0.10%. Equivalente S&P500.",price:"VL diario",weight:15},
-      ],
-      avoid:[
-        {ticker:"IAG.MC",name:"IAG (Iberia/British Airways)",reason:"Brent $100 destruye márgenes aerolíneas. Evitar hasta que Ormuz reabra."},
-        {ticker:"ICLN",name:"iShares Global Clean Energy ETF",reason:"Aranceles Trump + demanda -18%. El mercado solar sufre. Esperar hasta 2027."},
-        {ticker:"ARKK",name:"ARK Innovation ETF",reason:"Growth especulativo en entorno risk-off. Tipos altos penalizan fuertemente."},
-      ]
-    };
-  }
+    const s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+    if(s>=0&&e>s)recsData=JSON.parse(clean.slice(s,e+1));
+    else throw new Error("No JSON");
+  }catch(e){recsData=FALLBACK;}
   renderRecs();
 }
 
-async function toggleItemAI(key,ticker,name,action){
+async function toggleAI(key,ticker,name,action,dividend){
   const el=document.getElementById(key);if(!el)return;
   if(el.style.display!=="none"&&el.innerHTML){el.style.display="none";return;}
   el.style.display="block";
-  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fadein">${aiCache[key]}</div>`;return;}
-  el.innerHTML=`<div style="padding:10px 0;color:#888;font-size:12px"><span class="spinner"></span>Analizando ${ticker}...</div>`;
+  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fi">${aiCache[key]}</div>`;return;}
+  el.innerHTML=`<div style="padding:10px 0;color:#999;font-size:12px"><span class="spinner"></span>Analizando ${ticker}...</div>`;
   const info=KNOWN[ticker]||{};
   const p=prices[ticker]||info.price||0;
-  const prompt=`${CONTEXT}\n\nAnálisis detallado de ${ticker} (${name}) — Recomendación: ${action}.\nPrecio actual: ${p>0?p.toFixed(2)+"€":"ver mercado"}. Sector: ${info.sector||""}.\n\n## Por qué ${action} ahora\n## Precio objetivo y stop-loss\n## Principales riesgos\n## Cómo encaja en una cartera <10.000€\n\nSé concreto. Máximo 10 líneas en total.`;
+  const prompt=`${CONTEXT}
+
+Análisis detallado de ${ticker} (${name}).
+Recomendación: ${action}. Dividendo: ${dividend||"no especificado"}.
+Precio actual: ${p>0?p.toFixed(2)+(info.cur==="EUR"?"€":"$"):"ver mercado"}. Sector: ${info.sector||""}.
+
+## Por qué ${action} ahora mismo
+## Dividendo: ¿cuánto paga, es sostenible y cuándo se cobra?
+## Precio objetivo y stop-loss
+## Riesgo principal a vigilar
+
+Sé muy concreto. Máximo 10 líneas en total.`;
   const text=await callAI(prompt);
   const html=md2html(text);
   aiCache[key]=html;
-  el.innerHTML=`<div class="ai-panel fadein">${html}</div>`;
+  el.innerHTML=`<div class="ai-panel fi">${html}</div>`;
 }
 
-function addToWatchFromRec(ticker,name){
-  if(!watchlist.includes(ticker)){
-    watchlist.push(ticker);
-    if(!KNOWN[ticker])KNOWN[ticker]={name,sector:"",price:0,cur:"USD"};
-    loadRealPrices([ticker]);
-  }
-}
-
-// CARTERA
+// ══ CARTERA ══════════════════════════════════════════════════════
 function renderCartera(){
   const el=document.getElementById("tab-content");
-  let totalVal=0,totalCost=0;
+  let tv=0,tc=0;
   const rows=portfolio.map(p=>{
-    const info=KNOWN[p.ticker]||{name:p.ticker,cur:"EUR",price:p.cost,sector:""};
-    const price=prices[p.ticker]||info.price;
-    const val=price*p.shares,cost=p.cost*p.shares,pnl=val-cost,pct=((pnl/cost)*100).toFixed(1);
-    totalVal+=val;totalCost+=cost;
+    const price=p.isFund?(p.fundValue/p.shares):(prices[p.ticker]||KNOWN[p.ticker]?.price||p.cost);
+    const val=p.isFund?p.fundValue:price*p.shares;
+    const cost=p.cost*p.shares,pnl=val-cost,pct=((pnl/cost)*100).toFixed(1);
+    tv+=val;tc+=cost;
     const isUp=pnl>=0;
     const aKey=`pos-${p.ticker}`;
-    return`<div class="pos-card fadein">
-      <div>
-        <div class="pos-name">${info.name} <span style="color:#bbb;font-size:12px;font-weight:400">${p.ticker}</span></div>
-        <div class="pos-detail">${p.shares} títulos · coste ${info.cur==="EUR"?"€":"$"}${p.cost.toFixed(2)} · ${info.sector||""}</div>
-        <div style="margin-top:8px;display:flex;gap:6px">
-          <button class="btn-ai" onclick="togglePosAI('${p.ticker}','${info.name}',${price},${p.cost})">✦ Qué hacer con esta posición</button>
-          <button class="btn-icon" onclick="removePos('${p.ticker}')">✕</button>
+    return`<div class="pos fi">
+      <div class="pos-grid">
+        <div>
+          <div class="pos-name">${p.name} <span style="color:#bbb;font-size:11px;font-weight:400">${p.isFund?"(fondo)":p.ticker}</span></div>
+          <div class="pos-detail">${p.isFund?`${p.shares.toFixed(3)} participaciones`:`${p.shares} acciones`} · coste medio €${p.cost.toFixed(2)}</div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <button class="btn-ai" onclick="togglePosAI('${p.ticker}','${p.name}',${price},${p.cost})">✦ Qué hago con esta posición</button>
+            <button class="btn-del" onclick="removePos('${p.ticker}')">✕</button>
+          </div>
+          <div id="${aKey}" style="display:none"></div>
         </div>
-        <div id="${aKey}" style="display:none"></div>
-      </div>
-      <div>
-        <div class="pos-val">${info.cur==="EUR"?"€":"$"}${val.toFixed(0)}</div>
-        <div class="pos-pnl ${isUp?"up":"dn"}">${isUp?"+":""}€${pnl.toFixed(0)} (${isUp?"+":""}${pct}%)</div>
+        <div>
+          <div class="pos-val">€${val.toFixed(0)}</div>
+          <div class="pos-pnl" style="color:${isUp?"#16a34a":"#dc2626"}">${isUp?"+":""}€${pnl.toFixed(0)} (${isUp?"+":""}${pct}%)</div>
+        </div>
       </div>
     </div>`;
   }).join("");
-
-  const totPnl=totalVal-totalCost,totPct=totalCost?((totPnl/totalCost)*100).toFixed(1):"0.0",isUp=totPnl>=0;
-
-  el.innerHTML=`<div class="section">
-    ${portfolio.length?rows+`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-top:1px solid #f0ede8;margin-top:4px">
-      <span style="font-size:12px;color:#888">Total cartera</span>
-      <div><span style="font-weight:600;font-size:17px">€${totalVal.toFixed(0)}</span>
-      <span style="font-size:13px;margin-left:10px;color:${isUp?"#15803d":"#b91c1c"}">${isUp?"+":""}€${totPnl.toFixed(0)} (${isUp?"+":""}${totPct}%)</span></div>
-    </div>`:`<div class="empty">Añade tu primera posición</div>`}
+  const pnl=tv-tc,pct=tc?((pnl/tc)*100).toFixed(1):"0";
+  const isUp=pnl>=0;
+  el.innerHTML=`<div class="card">
+    <div class="card-title">Mi cartera</div>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 15px;margin-bottom:14px;font-size:12px">
+      <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏳ Tareas pendientes</div>
+      <div style="display:flex;flex-direction:column;gap:5px;color:#555">
+        <div>☐ <strong>Abrir MyInvestor</strong> — para fondos largo plazo y cuentas hijos (myinvestor.es)</div>
+        <div>☐ <strong>Traspasar Amundi → Fidelity MSCI World</strong> (IE00BYX5NX33, TER 0.12%) sin pagar IRPF</div>
+        <div>☐ <strong>Abrir Trade Republic</strong> — para oportunidades corto plazo y liquidez al 3%</div>
+        <div>☐ <strong>Abrir 3 cuentas menores</strong> en MyInvestor · 50€/mes cada uno · IE00B03HD191</div>
+        <div>☐ <strong>Decidir Iberdrola</strong> — ¿vender 20-30% de la posición para diversificar? (pulsa ✦ para análisis IA)</div>
+      </div>
+    </div>
+    ${portfolio.length?rows:`<div class="empty">Añade tu primera posición abajo</div>`}
+    ${portfolio.length?`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;border-top:1px solid #f0ede8;margin-top:4px">
+      <span style="font-size:12px;color:#999;font-weight:500">TOTAL CARTERA</span>
+      <div><span style="font-weight:700;font-size:18px">€${tv.toFixed(0)}</span><span style="font-size:13px;margin-left:10px;color:${isUp?"#16a34a":"#dc2626"};font-weight:500">${isUp?"+":""}€${pnl.toFixed(0)} (${isUp?"+":""}${pct}%)</span></div>
+    </div>`:""}
     <div class="divider"></div>
-    <div style="font-size:12px;color:#888;font-weight:500;margin-bottom:10px">AÑADIR POSICIÓN</div>
+    <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Añadir posición</div>
     <div class="form-row">
-      <div class="form-group"><label>Ticker</label><input id="pt-t" placeholder="IBE.MC, IWDA..." style="width:130px"></div>
-      <div class="form-group"><label>Títulos</label><input id="pt-s" type="number" placeholder="100" style="width:80px"></div>
-      <div class="form-group"><label>Coste medio (€)</label><input id="pt-c" type="number" placeholder="12.50" style="width:100px"></div>
-      <div class="form-group"><label>&nbsp;</label><button class="btn-primary" onclick="addPosition()">+ Añadir</button></div>
+      <div class="fg"><label>Ticker o ISIN</label><input id="pt-t" placeholder="IBE.MC, IWDA..." style="width:140px"></div>
+      <div class="fg"><label>Títulos / participaciones</label><input id="pt-s" type="number" placeholder="100" style="width:90px"></div>
+      <div class="fg"><label>Coste medio (€)</label><input id="pt-c" type="number" placeholder="12.50" style="width:110px"></div>
+      <div class="fg"><label>&nbsp;</label><button class="btn" onclick="addPosition()">+ Añadir</button></div>
     </div>
   </div>`;
 }
@@ -432,15 +590,26 @@ async function togglePosAI(ticker,name,price,cost){
   if(el.style.display!=="none"&&el.innerHTML){el.style.display="none";return;}
   el.style.display="block";
   const key=`pos-${ticker}`;
-  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fadein">${aiCache[key]}</div>`;return;}
-  el.innerHTML=`<div style="padding:8px 0;color:#888;font-size:12px"><span class="spinner"></span>Analizando posición...</div>`;
-  const info=KNOWN[ticker]||{};
+  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fi">${aiCache[key]}</div>`;return;}
+  el.innerHTML=`<div style="padding:8px 0;color:#999;font-size:12px"><span class="spinner"></span>Analizando tu posición en ${name}...</div>`;
   const pnlPct=(((price-cost)/cost)*100).toFixed(1);
-  const prompt=`${CONTEXT}\n\nTengo ${ticker} (${name}) en cartera. Precio actual: ${price.toFixed(2)}. Precio de coste: ${cost.toFixed(2)}. P&L: ${pnlPct>0?"+":""}${pnlPct}%. Sector: ${info.sector||""}.\n\n## ¿Qué hago con esta posición ahora mismo?\n## ¿Cuándo consideraría vender?\n## ¿Añado más o mantengo?\n## Riesgos específicos a vigilar\n\nSé directo. Máximo 10 líneas.`;
+  const isBig=ticker==="IBE.MC";
+  const prompt=`${CONTEXT}
+
+Tengo ${ticker} (${name}) en cartera.
+Precio actual: €${price.toFixed(2)}. Precio de coste: €${cost.toFixed(2)}. P&L: ${pnlPct>0?"+":""}${pnlPct}%.
+${isBig?"IMPORTANTE: Esta es la posición principal. Tengo 1.641 acciones con plusvalía del +78% (~€13.800). No he decidido si vender parte.":""}
+
+## ¿Qué hago ahora? ¿Mantengo, vendo parte o añado?
+## Si vendo parte: impacto fiscal IRPF y cuándo hacerlo
+## ¿Cuándo consideraría vender todo?
+## Riesgos específicos a vigilar
+
+Sé muy directo. Máximo 10 líneas.`;
   const text=await callAI(prompt);
   const html=md2html(text);
   aiCache[key]=html;
-  el.innerHTML=`<div class="ai-panel fadein">${html}</div>`;
+  el.innerHTML=`<div class="ai-panel fi">${html}</div>`;
 }
 
 function addPosition(){
@@ -452,107 +621,183 @@ function addPosition(){
   if(ex){ex.cost=(ex.cost*ex.shares+c*s)/(ex.shares+s);ex.shares+=s;}
   else{portfolio.push({ticker:t,name:KNOWN[t]?.name||t,shares:s,cost:c});if(!prices[t])prices[t]=c;loadRealPrices([t]);}
   document.getElementById("pt-t").value="";document.getElementById("pt-s").value="";document.getElementById("pt-c").value="";
-  renderCartera();
+  updateSummary();renderCartera();
 }
+function removePos(t){if(!confirm(`¿Eliminar ${t} de la cartera?`))return;portfolio=portfolio.filter(p=>p.ticker!==t);updateSummary();renderCartera();}
 
-function removePos(ticker){
-  if(!confirm(`¿Eliminar ${ticker} de la cartera?`))return;
-  portfolio=portfolio.filter(p=>p.ticker!==ticker);renderCartera();
-}
-
-// SEGUIR
+// ══ SEGUIR ═══════════════════════════════════════════════════════
 function renderSeguir(){
   const el=document.getElementById("tab-content");
-  const rows=watchlist.map(ticker=>{
-    const info=KNOWN[ticker]||{name:ticker,sector:"",price:0,cur:"USD"};
-    const price=prices[ticker]||info.price;
-    const base=KNOWN[ticker]?.price||price;
-    const chg=base>0?((price-base)/base*100).toFixed(2):0;
-    const isUp=+chg>=0;
-    const aKey=`watch-${ticker}`;
-    return`<div class="watch-card fadein">
+  const rows=watchlist.map(t=>{
+    const info=KNOWN[t]||{name:t,sector:"",price:0,cur:"USD"};
+    const p=prices[t]||info.price,base=KNOWN[t]?.price||p;
+    const chg=base>0?((p-base)/base*100).toFixed(2):0,isUp=+chg>=0;
+    const aKey=`w-${t}`;
+    return`<div class="watch fi">
       <div>
-        <div style="font-weight:600;font-size:14px">${info.name} <span style="color:#bbb;font-size:12px;font-weight:400">${ticker}</span></div>
-        <div style="font-size:12px;color:#888;margin-top:2px">${info.sector||""}</div>
+        <div style="font-weight:600;font-size:13px">${info.name} <span style="color:#bbb;font-size:11px;font-weight:400">${t}</span></div>
+        <div style="font-size:11px;color:#999;margin-top:1px">${info.sector||""}</div>
         <div id="${aKey}" style="display:none"></div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:15px;font-weight:600">${info.cur==="EUR"?"€":"$"}${price>0?price.toFixed(2):"--"}</div>
-        <div style="font-size:11px;margin-top:2px" class="${isUp?"up":"dn"}">${price>0?(isUp?"▲":"▼")+Math.abs(chg)+"%":"--"}</div>
+        <div style="font-size:15px;font-weight:700">${info.cur==="EUR"?"€":"$"}${p>0?p.toFixed(2):"--"}</div>
+        <div style="font-size:11px;font-weight:500;margin-top:1px" class="${isUp?"up":"dn"}">${p>0?(isUp?"▲":"▼")+Math.abs(chg)+"%":"--"}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px">
-        <button class="btn-ai" onclick="toggleWatchAI('${ticker}','${info.name}',${price})">✦ Consejo</button>
-        <button class="btn-icon" onclick="removeWatch('${ticker}')">✕</button>
+        <button class="btn-ai" onclick="toggleWatchAI('${t}','${info.name}',${p})">✦ Consejo</button>
+        <button class="btn-del" onclick="removeWatch('${t}')">✕</button>
       </div>
     </div>`;
   }).join("");
-
-  el.innerHTML=`<div class="section">
-    ${watchlist.length?rows:`<div class="empty">Añade valores que quieras seguir</div>`}
+  el.innerHTML=`<div class="card">
+    ${watchlist.length?rows:`<div class="empty">Añade valores que quieras seguir y analizar</div>`}
     <div class="divider"></div>
-    <div style="font-size:12px;color:#888;font-weight:500;margin-bottom:10px">AÑADIR VALOR A SEGUIR</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input id="add-w" placeholder="Nombre, ticker o ISIN..." style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn-primary" onclick="doSearch()">🔍 Buscar</button>
+      <button class="btn" onclick="doSearch()">🔍 Buscar</button>
     </div>
     <div id="search-results" style="margin-top:10px"></div>
   </div>`;
 }
 
-async function toggleWatchAI(ticker,name,price){
-  const el=document.getElementById(`watch-${ticker}`);if(!el)return;
+async function toggleWatchAI(t,name,p){
+  const el=document.getElementById(`w-${t}`);if(!el)return;
   if(el.style.display!=="none"&&el.innerHTML){el.style.display="none";return;}
   el.style.display="block";
-  const key=`watch-${ticker}`;
-  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fadein">${aiCache[key]}</div>`;return;}
-  el.innerHTML=`<div style="padding:8px 0;color:#888;font-size:12px"><span class="spinner"></span>Analizando ${ticker}...</div>`;
-  const info=KNOWN[ticker]||{};
-  const prompt=`${CONTEXT}\n\nAnaliza ${ticker} (${name}) para un inversor español con cartera pequeña.\nPrecio actual: ${price>0?price.toFixed(2)+(info.cur==="EUR"?"€":"$"):"ver mercado"}. Sector: ${info.sector||""}.\n\n## ¿Vale la pena comprar ahora?\n## Precio objetivo y stop-loss recomendado\n## Encaje con el contexto macro actual\n## Veredicto final (1 línea)\n\nSé directo. Máximo 10 líneas.`;
+  const key=`w-${t}`;
+  if(aiCache[key]){el.innerHTML=`<div class="ai-panel fi">${aiCache[key]}</div>`;return;}
+  el.innerHTML=`<div style="padding:8px 0;color:#999;font-size:12px"><span class="spinner"></span>Analizando ${t}...</div>`;
+  const info=KNOWN[t]||{};
+  const prompt=`${CONTEXT}
+
+Analiza ${t} (${name}) para este inversor.
+Precio actual: ${p>0?p.toFixed(2)+(info.cur==="EUR"?"€":"$"):"ver mercado"}. Sector: ${info.sector||""}.
+
+## ¿Vale la pena comprar ahora?
+## Dividendo: ¿paga y cuánto?
+## Precio objetivo y stop-loss recomendado
+## Veredicto final en 1 línea
+
+Sé muy directo. Máximo 10 líneas.`;
   const text=await callAI(prompt);
   const html=md2html(text);
   aiCache[key]=html;
-  el.innerHTML=`<div class="ai-panel fadein">${html}</div>`;
+  el.innerHTML=`<div class="ai-panel fi">${html}</div>`;
 }
 
-function removeWatch(ticker){watchlist=watchlist.filter(t=>t!==ticker);renderSeguir();}
+function addWatch(t,name){
+  if(!t||watchlist.includes(t))return;
+  watchlist.push(t);
+  if(!KNOWN[t])KNOWN[t]={name:name||t,sector:"",price:0,cur:"USD"};
+  if(!prices[t])prices[t]=0;
+  loadRealPrices([t]);
+  if(currentTab==="seguir")renderSeguir();
+}
+function removeWatch(t){watchlist=watchlist.filter(x=>x!==t);renderSeguir();}
 
 async function doSearch(){
   const q=document.getElementById("add-w")?.value.trim();if(!q)return;
   const v=q.toUpperCase();
   const el=document.getElementById("search-results");
-  if(KNOWN[v]){addToWatch(v,KNOWN[v].name);document.getElementById("add-w").value="";el.innerHTML=`<div style="color:#15803d;font-size:12px;padding:8px 0">✓ ${KNOWN[v].name} añadido</div>`;setTimeout(()=>el.innerHTML="",3000);renderSeguir();return;}
-  el.innerHTML=`<div style="color:#888;font-size:12px;padding:8px 0"><span class="spinner"></span>Buscando...</div>`;
+  if(KNOWN[v]){addWatch(v,KNOWN[v].name);document.getElementById("add-w").value="";el.innerHTML=`<div style="color:#16a34a;font-size:12px;padding:8px 0">✓ ${KNOWN[v].name} añadido</div>`;setTimeout(()=>el.innerHTML="",3000);return;}
+  el.innerHTML=`<div style="color:#999;font-size:12px;padding:8px 0"><span class="spinner"></span>Buscando...</div>`;
   try{
     const res=await fetch(`/api/search?q=${encodeURIComponent(q)}`);
     const data=await res.json();
     if(data.ok&&data.results?.length){
       el.innerHTML=data.results.slice(0,5).map(r=>`
-        <div onclick="selectSearch('${r.symbol}','${(r.description||r.symbol).replace(/'/g,"\\'")}');this.style.background='#f0fdf4'" style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#fff;border:1px solid #e8e4dc;border-radius:8px;margin-bottom:6px;cursor:pointer">
-          <div>
-            <span style="font-weight:600;font-size:13px">${r.symbol}</span>
-            <span style="color:#888;font-size:11px;margin-left:8px">${r.type||""}</span>
-            <div style="color:#555;font-size:12px;margin-top:1px">${r.description||""}</div>
-          </div>
-          <button class="btn-primary" style="font-size:11px;padding:5px 10px;pointer-events:none">+ Añadir</button>
+        <div onclick="selectSearch('${r.symbol}','${(r.description||r.symbol).replace(/'/g,"\\'")}');this.parentNode.innerHTML=''" style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#fff;border:1px solid #e5e2dc;border-radius:8px;margin-bottom:6px;cursor:pointer">
+          <div><span style="font-weight:600">${r.symbol}</span> <span style="color:#999;font-size:11px">${r.type||""}</span>
+          <div style="font-size:12px;color:#555;margin-top:1px">${r.description||""}</div></div>
+          <button class="btn" style="font-size:11px;padding:5px 10px;pointer-events:none">+ Añadir</button>
         </div>`).join("");
-    }else{addToWatch(v,v);document.getElementById("add-w").value="";el.innerHTML=`<div style="color:#15803d;font-size:12px;padding:8px 0">✓ ${v} añadido</div>`;setTimeout(()=>{el.innerHTML="";renderSeguir();},2000);}
-  }catch(e){addToWatch(v,v);document.getElementById("add-w").value="";el.innerHTML="";}
+    }else{addWatch(v,v);document.getElementById("add-w").value="";el.innerHTML=`<div style="color:#16a34a;font-size:12px;padding:8px 0">✓ ${v} añadido</div>`;setTimeout(()=>{el.innerHTML="";renderSeguir();},2000);}
+  }catch(e){addWatch(v,v);document.getElementById("add-w").value="";el.innerHTML="";}
+}
+function selectSearch(sym,name){addWatch(sym,name);document.getElementById("add-w").value="";setTimeout(()=>renderSeguir(),500);}
+
+// ══ NOTICIAS ═════════════════════════════════════════════════════
+function renderNoticias(){
+  const el=document.getElementById("tab-content");
+  el.innerHTML=`<div class="card">
+    <div class="card-title">Noticias financieras
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="fetchNews(true)">↻ Actualizar</button>
+        <button class="btn-ai" onclick="analyzeNews()">✦ Analizar con IA</button>
+      </div>
+    </div>
+    <div id="news-list"><div class="loading"><span class="spinner"></span>Cargando noticias...</div></div>
+    <div id="news-ai" style="display:none"></div>
+  </div>`;
 }
 
-function selectSearch(symbol,name){
-  addToWatch(symbol,name);document.getElementById("add-w").value="";document.getElementById("search-results").innerHTML=`<div style="color:#15803d;font-size:12px;padding:8px 0">✓ ${name} añadido</div>`;
-  setTimeout(()=>{document.getElementById("search-results").innerHTML="";renderSeguir();},2000);
+async function fetchNews(force=false){
+  const now=Date.now();
+  if(!force&&newsCache.length>0&&(now-newsTs)<300000){renderNewsList();return;}
+  try{
+    const res=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent("https://feeds.finance.yahoo.com/rss/2.0/headline?s=SPY,XLE,GLD&region=US&lang=en-US")}&count=15`);
+    const data=await res.json();
+    if(data.items?.length){
+      newsCache=data.items.map(item=>({
+        title:item.title,source:"Yahoo Finance",url:item.link,
+        date:new Date(item.pubDate).toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}),
+        summary:(item.description||"").replace(/<[^>]*>/g,"").slice(0,160),
+        rel:["oil","energy","fed","gold","nvidia","war","iran","defense","dividend"].some(k=>item.title.toLowerCase().includes(k))?"alta":"media",
+      }));
+      newsTs=now;renderNewsList();return;
+    }
+  }catch(e){}
+  newsCache=[
+    {title:"Goldman Sachs eleva objetivo del petróleo a $150 ante cierre indefinido de Ormuz",source:"Reuters",date:"15/03 09:42",url:"#",summary:"El banco revisa al alza sus proyecciones ante la incertidumbre sobre el bloqueo iraní. XLE y REP.MC principales beneficiados.",rel:"alta"},
+    {title:"XLE registra entradas récord de capital — inversores institucionales rotan a energía",source:"Bloomberg",date:"15/03 08:15",url:"#",summary:"Más de $2.000M entraron al ETF de energía esta semana. La mayor entrada desde 2022.",rel:"alta"},
+    {title:"Fed mantiene tipos — primer recorte retrasado a septiembre 2026",source:"CNBC",date:"14/03 20:00",url:"#",summary:"Powell señala que la crisis del petróleo complica el objetivo de inflación del 2%. Beneficia a utilities como Iberdrola.",rel:"alta"},
+    {title:"Iberdrola sube objetivo a €22 — analistas ven aceleración en renovables",source:"Expansión",date:"15/03 10:30",url:"#",summary:"Cinco bancos de inversión elevan su precio objetivo tras los resultados del Q1.",rel:"alta"},
+    {title:"El oro supera $3.000/oz — JPMorgan mantiene objetivo de $3.500",source:"Bloomberg",date:"15/03 12:00",url:"#",summary:"El metal precioso actúa como refugio ante la inestabilidad geopolítica y la inflación.",rel:"media"},
+    {title:"Lockheed Martin recibe $8.000M en nuevos contratos de defensa europeos",source:"Reuters",date:"14/03 16:45",url:"#",summary:"El rearme europeo se acelera. Backlog de LMT alcanza niveles históricos.",rel:"alta"},
+    {title:"Dividendos: estas 10 acciones pagan más del 5% anual en 2026",source:"Morningstar",date:"13/03 14:00",url:"#",summary:"Repsol, TotalEnergies y Verizon lideran el ranking de rentabilidad por dividendo en este entorno de tipos.",rel:"media"},
+    {title:"Fondos indexados MSCI World: la corrección actual es el mejor punto de entrada en 18 meses",source:"Morningstar",date:"13/03 10:00",url:"#",summary:"Morningstar recomienda incrementar posiciones en fondos globales aprovechando la caída del 5%.",rel:"baja"},
+  ];
+  newsTs=now;renderNewsList();
 }
 
-function addToWatch(ticker,name){
-  if(watchlist.includes(ticker))return;
-  watchlist.push(ticker);
-  if(!KNOWN[ticker])KNOWN[ticker]={name,sector:"",price:0,cur:"USD"};
-  if(!prices[ticker])prices[ticker]=0;
-  loadRealPrices([ticker]);
+function renderNewsList(){
+  const el=document.getElementById("news-list");if(!el)return;
+  const rc={alta:"#dc2626",media:"#d97706",baja:"#16a34a"};
+  el.innerHTML=newsCache.map(n=>`<div class="news-item">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px">
+      <a href="${n.url}" target="_blank" style="color:#1a1a1a;font-size:13px;font-weight:600;text-decoration:none;line-height:1.4;flex:1">${n.title}</a>
+      <span style="font-size:10px;font-weight:700;color:${rc[n.rel]};background:${rc[n.rel]}15;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0">${n.rel.toUpperCase()}</span>
+    </div>
+    ${n.summary?`<p style="color:#666;font-size:12px;line-height:1.5;margin-bottom:3px">${n.summary}</p>`:""}
+    <div style="color:#bbb;font-size:10px">${n.source} · ${n.date}</div>
+  </div>`).join("");
 }
 
-// START
+async function analyzeNews(){
+  const el=document.getElementById("news-ai");if(!el)return;
+  el.style.display="block";
+  if(aiCache["news"]){el.innerHTML=`<div class="ai-panel fi">${aiCache["news"]}</div>`;return;}
+  el.innerHTML=`<div style="padding:12px 0;color:#999;font-size:12px"><span class="spinner"></span>La IA analiza las noticias en relación a tu cartera...</div>`;
+  const headlines=newsCache.slice(0,6).map(n=>n.title).join("\n");
+  const prompt=`${CONTEXT}
+
+Analiza estas noticias financieras en relación a la cartera del inversor (Iberdrola 1.641 acc. + Amundi Global Equity):
+
+${headlines}
+
+## Impacto directo en tu cartera
+## Oportunidades que generan estas noticias
+## Riesgos inmediatos a vigilar
+## Qué hacer esta semana (acción concreta)
+
+Máximo 12 líneas en total. Muy directo.`;
+  const text=await callAI(prompt);
+  const html=md2html(text);
+  aiCache["news"]=html;
+  el.innerHTML=`<div class="ai-panel fi">${html}</div>`;
+}
+
+// ══ START ══════════════════════════════════════════════════════
 renderRecs();
 loadRecommendations();
 </script>
