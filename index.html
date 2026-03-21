@@ -204,26 +204,39 @@ const CONTEXT = `Eres un asesor financiero experto para inversores particulares 
 
 PERFIL DEL INVERSOR:
 - Juanjo, 44 años, ingresos familiares ~80.000€/año (él y su mujer)
-- Cartera propia ~€35.700: Iberdrola 1.641 acciones (coste medio €10,75, plusvalía ~+78%) + Fondo Amundi Global Equity A EUR ACC LU1883342377 (valor ~€4.271, en Selfbank)
-- Aporta 200-400€/mes adicionales para él y su mujer
-- Brokers: Selfbank (Iberdrola actual). Abriendo MyInvestor (fondos largo plazo) y Trade Republic (oportunidades corto)
-- Pendiente: traspasar Amundi a Fidelity MSCI World IE00BYX5NX33 (TER 0.12%) sin IRPF
-- Pendiente: decidir si reducir parte de Iberdrola para diversificar (plusvalía €13.800, tramo IRPF 21%)
 - Estrategia: 80% base sólida (medio-largo plazo) + 20% oportunidades corto plazo
-- Objetivo: crecer capital + liquidez para imprevistos
+- Objetivo: crecer capital + liquidez para imprevistos + patrimonio familiar
 
-CUENTAS HIJOS (MyInvestor, 50€/mes cada uno, fondo Vanguard Global Stock IE00B03HD191):
-- Hijo mayor: 12 años → 6 años hasta los 18 → estimado ~€4.600
-- Mellizo 1: 10 años → 8 años hasta los 18 → estimado ~€7.000
-- Mellizo 2: 10 años → 8 años hasta los 18 → estimado ~€7.000
+CARTERA ACTUAL COMPLETA:
+- Iberdrola: 520 acc. en Selfbank (~€9.971) + 1.672 acc. en BBVA (~€32.061) = 2.192 acc. TOTAL (~€42.032, coste medio ~€10,75, plusvalía ~+78%)
+- Amundi Global Equity A EUR ACC (LU1883342377): 18,089 part. en Selfbank (~€4.271)
+- Fondo en Cajamar: bloqueado por hipoteca
+- TOTAL: ~€46.303 (91% en Iberdrola — diversificación pendiente)
+- Dividendo Iberdrola julio 2026: €0,41/acc. = ~€899 con 2.192 acciones
+
+BROKERS Y PLAN:
+- Selfbank: Iberdrola 520 acc. + Amundi (mantener)
+- BBVA: Iberdrola 1.672 acc. + €33/año custodia (traspasar a MyInvestor en otoño)
+- MyInvestor: ABRIENDO ESTA SEMANA — fondos largo plazo + 3 cuentas menores
+- Trade Republic: PRÓXIMAMENTE — oportunidades corto + liquidez al 3%
+
+TAREAS PENDIENTES:
+1. Abrir MyInvestor esta semana
+2. Traspasar Amundi → Fidelity MSCI World IE00BYX5NX33 (TER 0.12%) sin IRPF
+3. Abrir 3 cuentas menores — 50€/mes — IE00B03HD191
+4. Cobrar dividendo Iberdrola julio (~€899)
+5. Otoño: traspasar Iberdrola BBVA → MyInvestor y vender tramos 200-300 acc. para diversificar
+6. Abrir Trade Republic
+
+CUENTAS HIJOS (MyInvestor, 50€/mes, fondo IE00B03HD191):
+- Hijo mayor: 12 años → 6 años hasta los 18 → ~€4.600
+- Mellizo 1: 10 años → 8 años hasta los 18 → ~€7.000
+- Mellizo 2: 10 años → 8 años hasta los 18 → ~€7.000
 
 CONTEXTO MACRO ACTUAL (marzo 2026):
-- Estrecho de Ormuz cerrado por tensión con Irán
-- Brent $101/barril (+40% en 3 meses), Goldman objetivo $150
-- S&P500 en corrección -5% desde máximos, VIX 28
-- Fed retrasa primer recorte tipos a septiembre 2026
-- Presupuestos defensa UE +40% por rearme
-- JPMorgan objetivo oro $3.500 a fin 2026`;
+- Ormuz cerrado, Brent $101, Goldman objetivo $150
+- S&P500 -5%, VIX 28, Fed retrasa tipos a sept 2026
+- Rearme europeo +40%, JPMorgan objetivo oro $3.500`;
 
 // ══ DATOS ══════════════════════════════════════════════════════
 const KNOWN = {
@@ -251,7 +264,8 @@ const KNOWN = {
 
 let prices = Object.fromEntries(Object.keys(KNOWN).map(k=>[k,KNOWN[k].price]));
 let portfolio = [
-  {ticker:"IBE.MC", name:"Iberdrola", shares:1641, cost:10.75},
+  {ticker:"IBE.MC", name:"Iberdrola (Selfbank)", shares:520, cost:10.75},
+  {ticker:"IBE.MC-BBVA", name:"Iberdrola (BBVA)", shares:1672, cost:10.75, altTicker:"IBE.MC"},
   {ticker:"LU1883342377", name:"Amundi Global Equity A EUR ACC", shares:18.089, cost:236.22, isFund:true, fundValue:4271.17},
 ];
 let watchlist = [];
@@ -302,7 +316,7 @@ function updateSummary(){
   let totalVal=0,totalCost=0;
   portfolio.forEach(p=>{
     if(p.isFund){totalVal+=p.fundValue;totalCost+=p.cost*p.shares;}
-    else{const price=prices[p.ticker]||KNOWN[p.ticker]?.price||p.cost;totalVal+=price*p.shares;totalCost+=p.cost*p.shares;}
+    else{const t=p.altTicker||p.ticker;const price=prices[t]||KNOWN[t]?.price||p.cost;totalVal+=price*p.shares;totalCost+=p.cost*p.shares;}
   });
   const pnl=totalVal-totalCost,pct=totalCost?((pnl/totalCost)*100).toFixed(1):"0";
   const sv=document.getElementById("ps-val");if(sv)sv.textContent=`€${totalVal.toFixed(0)}`;
@@ -531,7 +545,8 @@ function renderCartera(){
   const el=document.getElementById("tab-content");
   let tv=0,tc=0;
   const rows=portfolio.map(p=>{
-    const price=p.isFund?(p.fundValue/p.shares):(prices[p.ticker]||KNOWN[p.ticker]?.price||p.cost);
+    const t=p.altTicker||p.ticker;
+    const price=p.isFund?(p.fundValue/p.shares):(prices[t]||KNOWN[t]?.price||p.cost);
     const val=p.isFund?p.fundValue:price*p.shares;
     const cost=p.cost*p.shares,pnl=val-cost,pct=((pnl/cost)*100).toFixed(1);
     tv+=val;tc+=cost;
@@ -560,13 +575,15 @@ function renderCartera(){
   el.innerHTML=`<div class="card">
     <div class="card-title">Mi cartera</div>
     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 15px;margin-bottom:14px;font-size:12px">
-      <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏳ Tareas pendientes</div>
+      <div style="font-weight:700;color:#92400e;margin-bottom:6px">⏳ Plan de acción</div>
       <div style="display:flex;flex-direction:column;gap:5px;color:#555">
-        <div>☐ <strong>Abrir MyInvestor</strong> — para fondos largo plazo y cuentas hijos (myinvestor.es)</div>
-        <div>☐ <strong>Traspasar Amundi → Fidelity MSCI World</strong> (IE00BYX5NX33, TER 0.12%) sin pagar IRPF</div>
-        <div>☐ <strong>Abrir Trade Republic</strong> — para oportunidades corto plazo y liquidez al 3%</div>
-        <div>☐ <strong>Abrir 3 cuentas menores</strong> en MyInvestor · 50€/mes cada uno · IE00B03HD191</div>
-        <div>☐ <strong>Decidir Iberdrola</strong> — ¿vender 20-30% de la posición para diversificar? (pulsa ✦ para análisis IA)</div>
+        <div>☐ <strong>Esta semana:</strong> Abrir MyInvestor (myinvestor.es) — fondos + cuentas hijos</div>
+        <div>☐ <strong>Esta semana:</strong> Traspasar Amundi (Selfbank) → Fidelity MSCI World IE00BYX5NX33 sin IRPF</div>
+        <div>☐ <strong>Esta semana:</strong> Abrir 3 cuentas menores en MyInvestor — 50€/mes — IE00B03HD191</div>
+        <div>☐ <strong>Julio:</strong> Cobrar dividendo Iberdrola ~€899 (€0,41 × 2.192 acc.)</div>
+        <div>☐ <strong>Otoño:</strong> Traspasar Iberdrola BBVA → MyInvestor (coste ~€112, sin IRPF)</div>
+        <div>☐ <strong>Otoño:</strong> Vender Iberdrola en tramos 200-300 acc. para diversificar a fondos globales</div>
+        <div>☐ <strong>Sin prisa:</strong> Abrir Trade Republic para oportunidades corto plazo</div>
       </div>
     </div>
     ${portfolio.length?rows:`<div class="empty">Añade tu primera posición abajo</div>`}
